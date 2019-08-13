@@ -17,6 +17,9 @@ function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
 }
 
 
+/**
+ * Implements hook_field_group_build_pre_render_alter().
+ */
 function ulf_pretix_field_group_build_pre_render_alter(&$element) {
   // ID needed due to https://www.drupal.org/project/field_group/issues/2318197
   if (user_access('administer ulf pretix user settings')) {

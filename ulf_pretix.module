@@ -4,5 +4,6 @@
  * Code for the Ulf Pretix feature.
  */
 
+include_once 'ulf_pretix.features.inc';
 include_once 'ulf_pretix.permissions.inc';
 include_once 'ulf_pretix.form_alterations.inc';
