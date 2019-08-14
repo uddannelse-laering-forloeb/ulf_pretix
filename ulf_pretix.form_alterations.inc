@@ -32,7 +32,7 @@ function ulf_pretix_field_group_build_pre_render_alter(&$element) {
       );
     }
   }
-  if ($element['#form_id'] == 'course_node_form') {
+  if ($element['#form_id'] == 'course_node_form' || $element['#form_id'] == 'course_educators_node_form') {
     $user_wrapper =  entity_metadata_wrapper('user', $element['#node']->uid);
     $pretix_enabled = $user_wrapper->field_pretix_enable->value();
     if (!$pretix_enabled) {
@@ -53,8 +53,8 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
   // Set default values when the form is loaded.
   if(in_array($form_id, $pretix_node_forms)) {
     $form['#attached']['css'][] = drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css';
+    $form['field_pretix_out_of_stock'][LANGUAGE_NONE]['#attributes']['disabled'] = TRUE;
     $form['field_pretix_wait_list'][LANGUAGE_NONE]['#attributes']['disabled'] = TRUE;
-    $form['field_pretix_wait_list'][LANGUAGE_NONE]['#attributes']['readonly'] = TRUE;
 
     // Set free for pretix date row if the course is free.
     if($form['field_free'][LANGUAGE_NONE]['#default_value']) {
