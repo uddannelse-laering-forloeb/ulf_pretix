@@ -34,7 +34,7 @@ function ulf_pretix_field_default_field_bases() {
   // Exported field_base: 'field_pretix_date'.
   $field_bases['field_pretix_date'] = array(
     'active' => 1,
-    'cardinality' => 1,
+    'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pretix_date',
@@ -108,6 +108,31 @@ function ulf_pretix_field_default_field_bases() {
     'type' => 'date',
   );
 
+  // Exported field_base: 'field_pretix_free'.
+  $field_bases['field_pretix_free'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_pretix_free',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => '',
+        1 => '',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_boolean',
+  );
+
   // Exported field_base: 'field_pretix_max_per_order'.
   $field_bases['field_pretix_max_per_order'] = array(
     'active' => 1,
@@ -144,6 +169,31 @@ function ulf_pretix_field_default_field_bases() {
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_pretix_out_of_stock'.
+  $field_bases['field_pretix_out_of_stock'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_pretix_out_of_stock',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => '',
+        1 => '',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_boolean',
+  );
+
   // Exported field_base: 'field_pretix_presale'.
   $field_bases['field_pretix_presale'] = array(
     'active' => 1,
@@ -171,6 +221,25 @@ function ulf_pretix_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'date',
+  );
+
+  // Exported field_base: 'field_pretix_price'.
+  $field_bases['field_pretix_price'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_pretix_price',
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'number',
+    'settings' => array(
+      'decimal_separator' => ',',
+      'precision' => 10,
+      'scale' => 2,
+    ),
+    'translatable' => 0,
+    'type' => 'number_decimal',
   );
 
   // Exported field_base: 'field_pretix_spaces'.
@@ -209,13 +278,13 @@ function ulf_pretix_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_pretix_start_dato'.
-  $field_bases['field_pretix_start_dato'] = array(
+  // Exported field_base: 'field_pretix_start_date'.
+  $field_bases['field_pretix_start_date'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_pretix_start_dato',
+    'field_name' => 'field_pretix_start_date',
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',

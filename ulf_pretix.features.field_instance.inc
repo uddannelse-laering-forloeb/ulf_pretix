@@ -11,6 +11,44 @@ function ulf_pretix_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance:
+  // 'field_collection_item-field_pretix_date-field_pretix_free'.
+  $field_instances['field_collection_item-field_pretix_date-field_pretix_free'] = array(
+    'bundle' => 'field_pretix_date',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 4,
+      ),
+    ),
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_pretix_free',
+    'label' => 'Gratis',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
   // 'field_collection_item-field_pretix_date-field_pretix_presale'.
   $field_instances['field_collection_item-field_pretix_date-field_pretix_presale'] = array(
     'bundle' => 'field_pretix_date',
@@ -21,6 +59,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'long',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -37,7 +76,7 @@ function ulf_pretix_field_default_field_instances() {
     'label' => 'Forsalg',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -50,13 +89,54 @@ function ulf_pretix_field_default_field_instances() {
         'increment' => 15,
         'input_format' => 'd/m/Y - H:i:s',
         'input_format_custom' => '',
-        'label_position' => 'above',
-        'no_fieldset' => 0,
+        'label_position' => 'none',
+        'no_fieldset' => 1,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 3,
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'field_collection_item-field_pretix_date-field_pretix_price'.
+  $field_instances['field_collection_item-field_pretix_date-field_pretix_price'] = array(
+    'bundle' => 'field_pretix_date',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 2,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_decimal',
+        'weight' => 5,
+      ),
+    ),
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_pretix_price',
+    'label' => 'Pris',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => 'kr.',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 4,
     ),
   );
 
@@ -97,13 +177,13 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 2,
+      'weight' => 0,
     ),
   );
 
   // Exported field_instance:
-  // 'field_collection_item-field_pretix_date-field_pretix_start_dato'.
-  $field_instances['field_collection_item-field_pretix_date-field_pretix_start_dato'] = array(
+  // 'field_collection_item-field_pretix_date-field_pretix_start_date'.
+  $field_instances['field_collection_item-field_pretix_date-field_pretix_start_date'] = array(
     'bundle' => 'field_pretix_date',
     'deleted' => 0,
     'description' => '',
@@ -112,6 +192,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'long',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -120,15 +201,15 @@ function ulf_pretix_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 0,
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'field_collection_item',
-    'field_name' => 'field_pretix_start_dato',
-    'label' => 'Start tidspunkt',
+    'field_name' => 'field_pretix_start_date',
+    'label' => 'Starttidspunkt',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -141,8 +222,8 @@ function ulf_pretix_field_default_field_instances() {
         'increment' => 15,
         'input_format' => 'd/m/Y - H:i:s',
         'input_format_custom' => '',
-        'label_position' => 'above',
-        'no_fieldset' => 0,
+        'label_position' => 'none',
+        'no_fieldset' => 1,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -160,16 +241,9 @@ function ulf_pretix_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'field_collection',
-        'settings' => array(
-          'add' => 'Add',
-          'delete' => 'Delete',
-          'description' => TRUE,
-          'edit' => 'Edit',
-          'view_mode' => 'full',
-        ),
-        'type' => 'field_collection_view',
-        'weight' => 41,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 38,
       ),
       'full' => array(
         'label' => 'above',
@@ -196,7 +270,7 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'field_collection',
       'settings' => array(),
       'type' => 'field_collection_embed',
-      'weight' => 50,
+      'weight' => 54,
     ),
   );
 
@@ -209,15 +283,9 @@ function ulf_pretix_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'number',
-        'settings' => array(
-          'decimal_separator' => '.',
-          'prefix_suffix' => TRUE,
-          'scale' => 0,
-          'thousand_separator' => '',
-        ),
-        'type' => 'number_integer',
-        'weight' => 40,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
       ),
       'full' => array(
         'label' => 'above',
@@ -248,7 +316,55 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 49,
+      'weight' => 51,
+    ),
+  );
+
+  // Exported field_instance: 'node-course-field_pretix_out_of_stock'.
+  $field_instances['node-course-field_pretix_out_of_stock'] = array(
+    'bundle' => 'course',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_out_of_stock',
+    'label' => 'Udsolgt',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 52,
     ),
   );
 
@@ -266,10 +382,9 @@ See the actual wait list in Pretix.',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 39,
+        'type' => 'hidden',
+        'weight' => 36,
       ),
       'full' => array(
         'label' => 'above',
@@ -298,7 +413,168 @@ See the actual wait list in Pretix.',
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 48,
+      'weight' => 53,
+    ),
+  );
+
+  // Exported field_instance: 'node-course_educators-field_pretix_date'.
+  $field_instances['node-course_educators-field_pretix_date'] = array(
+    'bundle' => 'course_educators',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_date',
+    'label' => 'Dato',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'field_collection',
+      'settings' => array(),
+      'type' => 'field_collection_embed',
+      'weight' => 77,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-course_educators-field_pretix_max_per_order'.
+  $field_instances['node-course_educators-field_pretix_max_per_order'] = array(
+    'bundle' => 'course_educators',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_max_per_order',
+    'label' => 'Max antal pr. ordre',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 74,
+    ),
+  );
+
+  // Exported field_instance: 'node-course_educators-field_pretix_out_of_stock'.
+  $field_instances['node-course_educators-field_pretix_out_of_stock'] = array(
+    'bundle' => 'course_educators',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 33,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_out_of_stock',
+    'label' => 'Udsolgt',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 75,
+    ),
+  );
+
+  // Exported field_instance: 'node-course_educators-field_pretix_wait_list'.
+  $field_instances['node-course_educators-field_pretix_wait_list'] = array(
+    'bundle' => 'course_educators',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_wait_list',
+    'label' => 'Venteliste',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 76,
     ),
   );
 
@@ -311,10 +587,9 @@ See the actual wait list in Pretix.',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 19,
+        'type' => 'hidden',
+        'weight' => 14,
       ),
     ),
     'entity_type' => 'user',
@@ -351,10 +626,9 @@ See the actual wait list in Pretix.',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 20,
+        'type' => 'hidden',
+        'weight' => 16,
       ),
     ),
     'entity_type' => 'user',
@@ -384,10 +658,9 @@ See the actual wait list in Pretix.',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 17,
+        'type' => 'hidden',
+        'weight' => 13,
       ),
     ),
     'entity_type' => 'user',
@@ -420,10 +693,9 @@ See the actual wait list in Pretix.',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 18,
+        'type' => 'hidden',
+        'weight' => 15,
       ),
     ),
     'entity_type' => 'user',
@@ -456,10 +728,9 @@ See the actual wait list in Pretix.',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 16,
+        'type' => 'hidden',
+        'weight' => 12,
       ),
     ),
     'entity_type' => 'user',
@@ -487,15 +758,18 @@ See the actual wait list in Pretix.',
   t('Enable pretix for this user');
   t('Forsalg');
   t('Fx. https://pretix.eu/');
+  t('Gratis');
   t('Max antal pr. ordre');
   t('Organiser slug');
   t('Pladser');
   t('Pretix domain name');
+  t('Pris');
   t('Standard event slug');
-  t('Start tidspunkt');
+  t('Starttidspunkt');
   t('The Api token is found in the pretix configuration');
   t('The part of the url immediately after domain name');
   t('The part of the url immediately after organizer slug');
+  t('Udsolgt');
   t('Venteliste');
   t('Whether there are users on the waitlist.
 See the actual wait list in Pretix.');
