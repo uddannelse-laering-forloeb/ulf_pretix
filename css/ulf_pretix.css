@@ -1,0 +1,22 @@
+.field-name-field-pretix-date .field-name-field-pretix-spaces,
+.field-name-field-pretix-date .field-name-field-pretix-start-date,
+.field-name-field-pretix-date .field-name-field-pretix-presale,
+.field-name-field-pretix-date .field-name-field-pretix-free,
+.field-name-field-pretix-date .field-name-field-pretix-price {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.field-name-field-pretix-date .field-name-field-pretix-spaces,
+.field-name-field-pretix-date .field-name-field-pretix-free,
+.field-name-field-pretix-date .field-name-field-pretix-price {
+  margin-right: 2em;
+}
+
+.field-name-field-pretix-date .field-name-field-pretix-free {
+  margin-top: 1.5em;
+}
+
+.field-name-field-pretix-date .form-submit {
+  margin-top: 1em;
+}
