@@ -5,15 +5,69 @@
  * Holds alterations for forms related to ulf_pretix module.
  */
 
+use Drupal\ulf_pretix\Pretix\Client;
+use Drupal\ulf_pretix\Pretix\Helper;
+
 /**
  * Implement hook_form_FORMID_alter().
  */
 function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
   $form['field_pretix_enable']['#access'] = user_access('administer ulf pretix user settings');
   $form['field_pretix_url']['#access'] = user_access('administer ulf pretix user settings');
-  $form['field_pretix_organiser_slug']['#access'] = user_access('administer ulf pretix user settings');
-  $form['field_pretix_standard_event_slug']['#access'] = user_access('administer ulf pretix user settings');
-  $form['field_pretix_api_token_secret_']['#access'] = user_access('administer ulf pretix user settings');
+  $form['field_pretix_api_token']['#access'] = user_access('administer ulf pretix user settings');
+  $form['field_pretix_organizer_slug']['#access'] = user_access('administer ulf pretix user settings');
+  $form['field_pretix_default_event_slug']['#access'] = user_access('administer ulf pretix user settings');
+
+  $form['#validate'][] = 'ulf_pretix_form_user_profile_validate';
+}
+
+/**
+ * User profile form validation.
+ */
+function ulf_pretix_form_user_profile_validate($form, &$form_state) {
+  $values = $form_state['values'];
+  if (isset($values['field_pretix_enable'][LANGUAGE_NONE][0]['value']) && 1 === $values['field_pretix_enable'][LANGUAGE_NONE][0]['value']) {
+    $service_url = $values['field_pretix_url'][LANGUAGE_NONE][0]['value'];
+    $api_token = $values['field_pretix_api_token'][LANGUAGE_NONE][0]['value'];
+    $organizer_slug = $values['field_pretix_organizer_slug'][LANGUAGE_NONE][0]['value'];
+    $event_slug = $values['field_pretix_default_event_slug'][LANGUAGE_NONE][0]['value'];
+
+    $helper = Helper::create();
+    $errors = $helper->validateTemplateEvent($service_url, $api_token, $organizer_slug, $event_slug);
+
+    if (null !== $errors) {
+      foreach ($errors as $key => $message) {
+        switch ($key) {
+          case 'service_url':
+            form_set_error('field_pretix_url', $message);
+            return;
+          case 'api_token':
+            form_set_error('field_pretix_api_token', $message);
+            return;
+          case 'organizer_slug':
+            form_set_error('field_pretix_organizer_slug', $message);
+            return;
+          case 'event_slug':
+            form_set_error('field_pretix_default_event_slug', $message);
+            return;
+          default:
+            // Fallback.
+            form_set_error('field_pretix_url', $message);
+            return;
+        }
+      }
+    }
+
+    drupal_set_message(t('Successfully connected to pretix'));
+
+    // Ensure that web hook is defined.
+    $result = $helper->ensureWebhook($service_url, $api_token, $organizer_slug);
+    if (isset($result->error)) {
+      drupal_set_message(t('Error creating pretix webhook: %error', ['%error' => $result->error]), 'error');
+    } else {
+      drupal_set_message(t('Successfully created pretix webhook'));
+    }
+  }
 }
 
 /**
@@ -52,7 +106,22 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
 
   // Set default values when the form is loaded.
   if(in_array($form_id, $pretix_node_forms)) {
+
     $form['#attached']['css'][] = drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css';
+
+    if (isset($form['#node'])) {
+      $helper = Helper::create();
+      $node = $form['#node'];
+      $form['field_pretix_max_per_order'][LANGUAGE_NONE]['#prefix'] = theme('node__pretix_info', [
+        'node' => $node,
+        'pretix_urls' => [
+          'event_url' => $helper->getPretixEventUrl($node),
+          'event_shop_url' => $helper->getPretixEventShopUrl($node),
+          'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
+        ],
+      ]);
+    }
+
     $form['field_pretix_out_of_stock'][LANGUAGE_NONE]['#attributes']['disabled'] = TRUE;
     $form['field_pretix_wait_list'][LANGUAGE_NONE]['#attributes']['disabled'] = TRUE;
 
@@ -91,5 +160,3 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 }
-
-

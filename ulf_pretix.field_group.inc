@@ -87,9 +87,9 @@ function ulf_pretix_field_group_info() {
     'weight' => '21',
     'children' => array(
       0 => 'field_pretix_url',
-      1 => 'field_pretix_organiser_slug',
-      2 => 'field_pretix_standard_event_slug',
-      3 => 'field_pretix_api_token_secret_',
+      1 => 'field_pretix_api_token',
+      2 => 'field_pretix_organizer_slug',
+      3 => 'field_pretix_default_event_slug',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

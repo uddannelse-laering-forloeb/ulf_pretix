@@ -1,0 +1,92 @@
+<?php
+
+/**
+ * @file
+ * Installation file for ulf_pretix module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function ulf_pretix_uninstall() {
+  variable_del('ulf_pretix_event_nodes');
+  variable_del('ulf_pretix');
+}
+
+/**
+ * Implements hook_schema().
+ */
+function ulf_pretix_schema() {
+  return [
+    'ulf_pretix_events' => [
+      'description' => 'Table to hold information about pretix events.',
+      'fields' => [
+        'nid' => [
+          'description' => 'The foreign key to {node}.nid',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'pretix_organizer' => [
+          'description' => 'The pretix organizer slug',
+          'type' => 'varchar',
+          'length' => 50,
+          'not null' => FALSE,
+          'default' => NULL,
+        ],
+        'pretix_event_slug' => [
+          'description' => 'The unique pretix event slug',
+          'type' => 'varchar',
+          'length' => 50,
+          'not null' => FALSE,
+          'default' => NULL,
+        ],
+        'data' => [
+          'description' => 'Pretix data (JSON)',
+          'type' => 'text',
+          'size' => 'normal',
+          'not null' => FALSE,
+          'default' => NULL,
+        ],
+      ],
+      'primary key' => ['nid'],
+    ],
+    'ulf_pretix_subevents' => [
+      'description' => 'Table to hold information about pretix subevents.',
+      'fields' => [
+        'nid' => [
+          'description' => 'The node id',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'item_type' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => FALSE,
+          'default' => NULL,
+        ],
+        'item_id' => [
+          'description' => 'The item id',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'pretix_subevent_id' => [
+          'description' => 'The pretix subevent id',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'data' => [
+          'description' => 'Pretix data (JSON)',
+          'type' => 'text',
+          'size' => 'normal',
+          'not null' => FALSE,
+          'default' => NULL,
+        ],
+      ],
+      'primary key' => ['nid', 'item_type', 'item_id'],
+    ],
+  ];
+}

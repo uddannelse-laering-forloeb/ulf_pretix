@@ -578,12 +578,12 @@ See the actual wait list in Pretix.',
     ),
   );
 
-  // Exported field_instance: 'user-user-field_pretix_api_token_secret_'.
-  $field_instances['user-user-field_pretix_api_token_secret_'] = array(
+  // Exported field_instance: 'user-user-field_pretix_api_token'.
+  $field_instances['user-user-field_pretix_api_token'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The Api token is found in the pretix configuration',
+    'description' => 'The API token is found in the pretix configuration',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -593,8 +593,8 @@ See the actual wait list in Pretix.',
       ),
     ),
     'entity_type' => 'user',
-    'field_name' => 'field_pretix_api_token_secret_',
-    'label' => 'API token secret ',
+    'field_name' => 'field_pretix_api_token',
+    'label' => 'API token',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -606,7 +606,46 @@ See the actual wait list in Pretix.',
       'settings' => array(
         'maxlength_js' => 0,
         'maxlength_js_label' => 'Content limited to @limit characters, remaining: <strong>@remaining</strong>',
-        'size' => 60,
+        'size' => 80,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 25,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_pretix_default_event_slug'.
+  $field_instances['user-user-field_pretix_default_event_slug'] = array(
+    'bundle' => 'user',
+    'default_value' => array(
+      0 => array(
+        'value' => 'standard',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'The part of the url immediately after the organizer slug, e.g. "event-slug" in "https://pretix.eu/control/event/organizer-slug/event-slug/"',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
+      ),
+    ),
+    'entity_type' => 'user',
+    'field_name' => 'field_pretix_default_event_slug',
+    'label' => 'Default event slug',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'maxlength_js' => 0,
+        'maxlength_js_label' => 'Content limited to @limit characters, remaining: <strong>@remaining</strong>',
+        'size' => 80,
       ),
       'type' => 'text_textfield',
       'weight' => 27,
@@ -649,12 +688,12 @@ See the actual wait list in Pretix.',
     ),
   );
 
-  // Exported field_instance: 'user-user-field_pretix_organiser_slug'.
-  $field_instances['user-user-field_pretix_organiser_slug'] = array(
+  // Exported field_instance: 'user-user-field_pretix_organizer_slug'.
+  $field_instances['user-user-field_pretix_organizer_slug'] = array(
     'bundle' => 'user',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The part of the url immediately after domain name',
+    'description' => 'The part of the url immediately after the domain name, e.g. "organizer-slug" in "https://pretix.eu/control/organizer/organizer-slug/"',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -664,8 +703,8 @@ See the actual wait list in Pretix.',
       ),
     ),
     'entity_type' => 'user',
-    'field_name' => 'field_pretix_organiser_slug',
-    'label' => 'Organiser slug',
+    'field_name' => 'field_pretix_organizer_slug',
+    'label' => 'Organizer slug',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -677,42 +716,7 @@ See the actual wait list in Pretix.',
       'settings' => array(
         'maxlength_js' => 0,
         'maxlength_js_label' => 'Content limited to @limit characters, remaining: <strong>@remaining</strong>',
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 25,
-    ),
-  );
-
-  // Exported field_instance: 'user-user-field_pretix_standard_event_slug'.
-  $field_instances['user-user-field_pretix_standard_event_slug'] = array(
-    'bundle' => 'user',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'The part of the url immediately after organizer slug',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 15,
-      ),
-    ),
-    'entity_type' => 'user',
-    'field_name' => 'field_pretix_standard_event_slug',
-    'label' => 'Standard event slug',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => 0,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'maxlength_js' => 0,
-        'maxlength_js_label' => 'Content limited to @limit characters, remaining: <strong>@remaining</strong>',
-        'size' => 60,
+        'size' => 80,
       ),
       'type' => 'text_textfield',
       'weight' => 26,
@@ -722,9 +726,13 @@ See the actual wait list in Pretix.',
   // Exported field_instance: 'user-user-field_pretix_url'.
   $field_instances['user-user-field_pretix_url'] = array(
     'bundle' => 'user',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => 'https://pretix.eu/',
+      ),
+    ),
     'deleted' => 0,
-    'description' => 'Fx. https://pretix.eu/',
+    'description' => 'The full pretix url, e.g. https://pretix.eu/',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -735,7 +743,7 @@ See the actual wait list in Pretix.',
     ),
     'entity_type' => 'user',
     'field_name' => 'field_pretix_url',
-    'label' => 'Pretix domain name',
+    'label' => 'Pretix url',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -752,23 +760,23 @@ See the actual wait list in Pretix.',
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('API token secret ');
+  t('API token');
   t('Dato');
+  t('Default event slug');
   t('Enable pretix');
   t('Enable pretix for this user');
   t('Forsalg');
-  t('Fx. https://pretix.eu/');
   t('Gratis');
   t('Max antal pr. ordre');
-  t('Organiser slug');
+  t('Organizer slug');
   t('Pladser');
-  t('Pretix domain name');
+  t('Pretix url');
   t('Pris');
-  t('Standard event slug');
   t('Starttidspunkt');
-  t('The Api token is found in the pretix configuration');
-  t('The part of the url immediately after domain name');
-  t('The part of the url immediately after organizer slug');
+  t('The API token is found in the pretix configuration');
+  t('The full pretix url, e.g. https://pretix.eu/');
+  t('The part of the url immediately after the domain name, e.g. "organizer-slug" in "https://pretix.eu/control/organizer/organizer-slug/"');
+  t('The part of the url immediately after the organizer slug, e.g. "event-slug" in "https://pretix.eu/control/event/organizer-slug/event-slug/"');
   t('Udsolgt');
   t('Venteliste');
   t('Whether there are users on the waitlist.

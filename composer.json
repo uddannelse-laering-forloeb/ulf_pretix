@@ -1,0 +1,25 @@
+{
+    "require": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0"
+    },
+    "require-dev": {
+        "drupal/coder": "^8.2"
+    },
+    "scripts": {
+        "check-coding-standards/phpcs": [
+            "phpcs --standard=phpcs.xml.dist"
+        ],
+        "check-coding-standards/twigcs": [
+            "twigcs lint templates"
+        ],
+        "check-coding-standards": [
+            "@check-coding-standards/phpcs"
+        ],
+        "apply-coding-standards/phpcs": [
+            "phpcbf --standard=phpcs.xml.dist"
+        ],
+        "apply-coding-standards": [
+            "@apply-coding-standards/phpcs"
+        ]
+    }
+}
