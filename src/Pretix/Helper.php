@@ -329,8 +329,7 @@ class Helper {
     $client = $this->getPretixClient($node);
 
     if (NULL === $client) {
-      drupal_set_message('Cannot get client', 'error');
-      return NULL;
+      return $this->error('Cannot get client');
     }
 
     $startDate = NULL;
@@ -345,8 +344,7 @@ class Helper {
     }
 
     if (NULL === $startDate) {
-      drupal_set_message('Cannot get start date for event. Pretix event not created.', 'warning');
-      return;
+      return $this->error('Cannot get start date for event. pretix event not created.');
     }
 
     $name = $this->getEventName($node);
@@ -363,8 +361,6 @@ class Helper {
       'date_from' => $dateFrom->format(\DateTime::ATOM),
       'is_public' => $node->status,
       'location' => ['da' => $location],
-
-      'max_items_per_order' => 187,
     ];
 
     $isNewEvent = NULL === $info;
@@ -376,20 +372,26 @@ class Helper {
       $templateEventSlug = $user->field_pretix_default_event_slug->value();
       $result = $client->cloneEvent($templateEventSlug, $data);
       if (isset($result->error)) {
-        return $this->logError($result, 'Cannot clone event');
+        return $this->apiError($result, 'Cannot clone event');
       }
       $eventData['template_event_slug'] = $templateEventSlug;
     }
     else {
       $result = $client->updateEvent($info['pretix_event_slug'], $data);
       if (isset($result->error)) {
-        return $this->logError($result, 'Cannot update event');
+        return $this->apiError($result, 'Cannot update event');
       }
     }
 
     $event = $result->data;
     $info = $this->savePretixEventInfo($node, $user, $event, $eventData);
     $subEvents = $this->synchronizePretixSubEvents($event, $node, $client);
+
+    foreach ($subEvents as $subEvent) {
+      if (isset($subEvent['error'])) {
+        return $subEvent;
+      }
+    }
 
     return [
       'status' => $isNewEvent ? 'created' : 'updated',
@@ -413,7 +415,7 @@ class Helper {
       $client = $this->getPretixClient($node);
       $result = $client->deleteEvent($info['pretix_event_slug']);
       if (isset($result->error)) {
-        return $this->logError($result, 'Cannot delete event');
+        return $this->apiError($result, 'Cannot delete event');
       }
 
       return [
@@ -465,7 +467,7 @@ class Helper {
       $info = $this->loadPretixEventInfo($node);
       if (NULL !== $info) {
         $url = rtrim($user->field_pretix_url->value(), '/');
-        return $url . '/' . $info['pretix_organizer'] . '/' . $info['pretix_event_slug'] . '/' . $path;
+        return $url . '/' . $info['pretix_organizer'] . '/' . $info['pretix_event_slug'] . '/';
       }
     }
 
@@ -531,9 +533,11 @@ class Helper {
     }
 
     // Clean up info on pretix sub-events.
-    db_delete('ulf_pretix_subevents')
-      ->condition('pretix_subevent_id', $pretixSubEventIds, 'NOT IN')
-      ->execute();
+    if (!empty($pretixSubEventIds)) {
+      db_delete('ulf_pretix_subevents')
+        ->condition('pretix_subevent_id', $pretixSubEventIds, 'NOT IN')
+        ->execute();
+    }
 
     return $info;
   }
@@ -549,7 +553,7 @@ class Helper {
     $templateEvent = $this->getPretixTemplateEvent($node);
     $result = $client->getSubEvents($templateEvent);
     if (isset($result->error) || 0 === $result->data->count) {
-      return $this->logError($result, 'Cannot get template event subevent');
+      return $this->apiError($result, 'Cannot get template event subevent');
     }
     $templateSubEvent = $result->data->results[0];
     unset($templateSubEvent->id);
@@ -560,7 +564,7 @@ class Helper {
       // Get first subevent from template event.
       $result = $client->getItems($event);
       if (isset($result->error) || 0 === $result->data->count) {
-        return $this->logError($result, 'Cannot get template event items');
+        return $this->apiError($result, 'Cannot get template event items');
       }
 
       // Always use the first product.
@@ -600,22 +604,23 @@ class Helper {
     if ($isNewItem) {
       $result = $client->createSubEvent($event->slug, $data);
       if (isset($result->error)) {
-        return $this->logError($result, 'Cannot create subevent');
+        return $this->apiError($result, 'Cannot create subevent');
       }
     }
     else {
       $subEventId = $itemInfo['pretix_subevent_id'];
       $result = $client->updateSubEvent($event->slug, $subEventId, $data);
       if (isset($result->error)) {
-        return $this->logError($result, 'Cannot update subevent');
+        return $this->apiError($result, 'Cannot update subevent');
       }
     }
 
     $subEvent = $result->data;
 
+    // Get sub-event quotas.
     $result = $client->getQuotas($event, ['query' => ['subevent' => $subEvent->id]]);
     if (isset($result->error)) {
-      return $this->logError($result, 'Cannot get subevent quotas');
+      return $this->apiError($result, 'Cannot get subevent quotas');
     }
 
     if (0 === $result->data->count) {
@@ -623,7 +628,7 @@ class Helper {
       $result = $client->getQuotas($templateEvent,
         ['subevent' => $templateSubEvent->id]);
       if (isset($result->error) || 0 === $result->data->count) {
-        return $this->logError($result, 'Cannot get template subevent quotas');
+        return $this->apiError($result, 'Cannot get template subevent quotas');
       }
 
       $templateQuota = $result->data->results[0];
@@ -633,14 +638,14 @@ class Helper {
       $data['items'] = [$product->id];
       $result = $client->createQuota($event, $data);
       if (isset($result->error)) {
-        $this->logError($result, 'Cannot create quota for subevent');
+        return $this->apiError($result, 'Cannot create quota for subevent');
       }
     }
 
     // Update the quota.
     $result = $client->getQuotas($event, ['query' => ['subevent' => $subEvent->id]]);
     if (isset($result->error) || 1 !== $result->data->count) {
-      return $this->logError($result, 'Cannot get subevent quota');
+      return $this->apiError($result, 'Cannot get subevent quota');
     }
 
     $quota = $result->data->results[0];
@@ -649,7 +654,7 @@ class Helper {
     $data = ['size' => $size];
     $result = $client->updateQuota($event, $quota, $data);
     if (isset($result->error)) {
-      return $this->logError($result, 'Cannot update subevent quota');
+      return $this->apiError($result, 'Cannot update subevent quota');
     }
 
     $info = $this->savePretixSubEventInfo($node, $item, $subEvent);
@@ -743,9 +748,20 @@ class Helper {
   }
 
   /**
-   * Log error.
+   * Report error.
    */
-  private function logError($result, $message) {
+  private function error($message) {
+    watchdog('ulf_pretix', 'Error: %message', [
+      '%message' => $message,
+    ], WATCHDOG_ERROR);
+
+    return ['error' => $message];
+  }
+
+  /**
+   * Report API error.
+   */
+  private function apiError($result, $message) {
     watchdog('ulf_pretix', 'Error: %message: %code %error', [
       '%message' => $message,
       '%code' => $result->code,

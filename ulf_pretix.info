@@ -1,5 +1,5 @@
 name = Ulf Pretix
-description = A module for using Pretix through it's API
+description = A module for using pretix through its API
 core = 7.x
 package = Ulf Addons
 dependencies[] = ctools
@@ -7,7 +7,6 @@ dependencies[] = date
 dependencies[] = features
 dependencies[] = field_collection
 dependencies[] = field_group (>1.5)
-dependencies[] = field_hidden
 dependencies[] = html5_tools
 dependencies[] = list
 dependencies[] = number

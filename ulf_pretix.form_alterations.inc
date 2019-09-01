@@ -63,7 +63,8 @@ function ulf_pretix_form_user_profile_validate($form, &$form_state) {
     // Ensure that web hook is defined.
     $result = $helper->ensureWebhook($service_url, $api_token, $organizer_slug);
     if (isset($result->error)) {
-      drupal_set_message(t('Error creating pretix webhook: %error', ['%error' => $result->error]), 'error');
+      $message = t('Error creating pretix webhook: %error', ['%error' => $result->error]);
+      form_set_error('field_pretix_organizer_slug', $message);
     } else {
       drupal_set_message(t('Successfully created pretix webhook'));
     }
