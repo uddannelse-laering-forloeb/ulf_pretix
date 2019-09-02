@@ -23,10 +23,11 @@ function ulf_pretix_field_group_info() {
     'label' => 'Pretix',
     'weight' => '73',
     'children' => array(
-      0 => 'field_pretix_out_of_stock',
-      1 => 'field_pretix_wait_list',
-      2 => 'field_pretix_max_per_order',
-      3 => 'field_pretix_date',
+      0 => 'field_pretix_date',
+      1 => 'field_pretix_max_per_order',
+      2 => 'field_pretix_out_of_stock',
+      3 => 'field_pretix_wait_list',
+      4 => 'field_pretix_email_recipient',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -55,10 +56,11 @@ function ulf_pretix_field_group_info() {
     'label' => 'Pretix',
     'weight' => '15',
     'children' => array(
-      0 => 'field_pretix_wait_list',
+      0 => 'field_pretix_date',
       1 => 'field_pretix_max_per_order',
-      2 => 'field_pretix_date',
-      3 => 'field_pretix_out_of_stock',
+      2 => 'field_pretix_out_of_stock',
+      3 => 'field_pretix_wait_list',
+      4 => 'field_pretix_email_recipient',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -86,10 +88,11 @@ function ulf_pretix_field_group_info() {
     'label' => 'Pretix',
     'weight' => '21',
     'children' => array(
-      0 => 'field_pretix_url',
-      1 => 'field_pretix_api_token',
+      0 => 'field_pretix_api_token',
+      1 => 'field_pretix_default_event_slug',
       2 => 'field_pretix_organizer_slug',
-      3 => 'field_pretix_default_event_slug',
+      3 => 'field_pretix_url',
+      4 => 'field_pretix_email_template',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

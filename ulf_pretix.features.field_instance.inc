@@ -274,6 +274,50 @@ function ulf_pretix_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-course-field_pretix_email_recipient'.
+  $field_instances['node-course-field_pretix_email_recipient'] = array(
+    'bundle' => 'course',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 39,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_email_recipient',
+    'label' => 'Email recipient',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'html5_tools',
+      'settings' => array(),
+      'type' => 'emailwidget',
+      'weight' => 55,
+    ),
+  );
+
   // Exported field_instance: 'node-course-field_pretix_max_per_order'.
   $field_instances['node-course-field_pretix_max_per_order'] = array(
     'bundle' => 'course',
@@ -450,6 +494,45 @@ See the actual wait list in Pretix.',
       'settings' => array(),
       'type' => 'field_collection_embed',
       'weight' => 77,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-course_educators-field_pretix_email_recipient'.
+  $field_instances['node-course_educators-field_pretix_email_recipient'] = array(
+    'bundle' => 'course_educators',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 38,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_email_recipient',
+    'label' => 'Email recipient',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'html5_tools',
+      'settings' => array(),
+      'type' => 'emailwidget',
+      'weight' => 78,
     ),
   );
 
@@ -763,6 +846,7 @@ See the actual wait list in Pretix.',
   t('API token');
   t('Dato');
   t('Default event slug');
+  t('Email recipient');
   t('Enable pretix');
   t('Enable pretix for this user');
   t('Forsalg');

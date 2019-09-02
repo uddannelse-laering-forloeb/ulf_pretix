@@ -201,7 +201,7 @@ class Helper {
         if (!empty($record)) {
           $info[$nid] = [
             'nid' => $record->nid,
-            'pretix_organizer' => $record->pretix_organizer,
+            'pretix_organizer_slug' => $record->pretix_organizer_slug,
             'pretix_event_slug' => $record->pretix_event_slug,
             'data' => json_decode($record->data, TRUE),
           ];
@@ -237,7 +237,7 @@ class Helper {
       ];
     $info = [
       'nid' => $node->nid,
-      'pretix_organizer' => $user->field_pretix_organizer_slug->value(),
+      'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
       'pretix_event_slug' => $event->slug,
       'data' => json_encode($existingData),
     ];
@@ -352,13 +352,12 @@ class Helper {
     // Events cannot be created as 'live' in Pretix (cf. https://docs.pretix.eu/en/latest/api/resources/events.html#post--api-v1-organizers-(organizer)-events-)
     // Is this also true for `clone`?
     $live = $node->status;
-    $dateFrom = $this->getDate($startDate);
 
     $data = [
       'name' => ['da' => $name],
       'live' => $live,
       'currency' => 'DKK',
-      'date_from' => $dateFrom->format(\DateTime::ATOM),
+      'date_from' => $this->formatDate($startDate),
       'is_public' => $node->status,
       'location' => ['da' => $location],
     ];
@@ -451,7 +450,7 @@ class Helper {
       $info = $this->loadPretixEventInfo($node);
       if (NULL !== $info) {
         $url = rtrim($user->field_pretix_url->value(), '/');
-        return $url . '/control/event/' . $info['pretix_organizer'] . '/' . $info['pretix_event_slug'] . '/' . $path;
+        return $url . '/control/event/' . $info['pretix_organizer_slug'] . '/' . $info['pretix_event_slug'] . '/' . $path;
       }
     }
 
@@ -467,7 +466,7 @@ class Helper {
       $info = $this->loadPretixEventInfo($node);
       if (NULL !== $info) {
         $url = rtrim($user->field_pretix_url->value(), '/');
-        return $url . '/' . $info['pretix_organizer'] . '/' . $info['pretix_event_slug'] . '/';
+        return $url . '/' . $info['pretix_organizer_slug'] . '/' . $info['pretix_event_slug'] . '/';
       }
     }
 
@@ -518,6 +517,12 @@ class Helper {
         $subEventIds[] = $result['info']['pretix_subevent_id'];
       }
       $info[] = $result;
+    }
+
+    foreach ($info as $subEvent) {
+      if (isset($subEvent['error'])) {
+        return $info;
+      }
     }
 
     // Delete pretix sub-events that no longer exist in Drupal.
@@ -677,6 +682,12 @@ class Helper {
       return $value;
     }
 
+// header('content-type: text/plain'); echo var_export([
+//   $value,
+//   new \DateTime('@' . $value),
+//   new \DateTime('@' . $value, new \DateTimeZone('Europe/Copenhagen')),
+// ], true); die(__FILE__.':'.__LINE__.':'.__METHOD__);
+
     if (is_numeric($value)) {
       return new \DateTime('@' . $value);
     }
@@ -734,7 +745,7 @@ class Helper {
   /**
    * Get pretix client.
    */
-  private function getPretixClient($node) {
+  public function getPretixClient($node) {
     $wrapper = entity_metadata_wrapper('user', $node->uid);
     if (TRUE === $wrapper->field_pretix_enable->value()) {
       return new Client(

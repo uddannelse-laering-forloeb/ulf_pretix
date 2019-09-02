@@ -5,6 +5,7 @@
   <file>ulf_pretix.info</file>
   <file>ulf_pretix.install</file>
   <file>ulf_pretix.module</file>
+  <file>includes/</file>
   <file>src/</file>
 
   <!-- Show progress -->

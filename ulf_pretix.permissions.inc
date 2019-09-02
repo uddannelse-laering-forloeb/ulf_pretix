@@ -12,6 +12,11 @@
  */
 function ulf_pretix_permission() {
   $permissions = array(
+    'administer ulf pretix settings' => array(
+      'title' => t('Administer pretix settings'),
+      'description' => t('Administer pretix settings'),
+    ),
+
     'administer ulf pretix user settings' => array(
       'title' => t('Administer pretix user settings'),
       'description' => t('Administer pretix user settings'),

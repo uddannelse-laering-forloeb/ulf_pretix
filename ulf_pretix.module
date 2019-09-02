@@ -18,6 +18,16 @@ use Drupal\ulf_pretix\Controller\WebhookController;
 function ulf_pretix_menu() {
   $items = [];
 
+  $items['admin/config/services/pretix'] = [
+    'title' => 'Pretix settings',
+    'description' => 'Settings and defaults for Pretix integration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['ulf_pretix_admin_settings_form'],
+    'access arguments' => ['administer ulf pretix settings'],
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'includes/ulf_pretix.admin.inc',
+  ];
+
   $items['ulf_pretix/pretix/webhook/%'] = [
     'title' => 'Pretix webhook',
     'description' => 'callback endpoint for pretix webhook',

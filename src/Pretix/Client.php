@@ -100,7 +100,7 @@ class Client {
    * Clone event.
    */
   public function cloneEvent($event, array $data) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
 
     return $this->post('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/clone/', [
       'data' => $data,
@@ -111,7 +111,7 @@ class Client {
    * Update event.
    */
   public function updateEvent($event, $data) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
 
     return $this->patch('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/', [
       'data' => $data,
@@ -122,7 +122,7 @@ class Client {
    * Delete event.
    */
   public function deleteEvent($event) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
 
     return $this->delete('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/');
   }
@@ -131,7 +131,7 @@ class Client {
    * Get items (products).
    */
   public function getItems($event) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
 
     return $this->get('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/items/');
   }
@@ -140,7 +140,7 @@ class Client {
    * Get quotas.
    */
   public function getQuotas($event, array $options = []) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
 
     return $this->get('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/quotas/', $options);
   }
@@ -149,7 +149,7 @@ class Client {
    * Create quota.
    */
   public function createQuota($event, array $data) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
 
     return $this->post('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/quotas/', ['data' => $data]);
   }
@@ -158,7 +158,7 @@ class Client {
    * Update quota.
    */
   public function updateQuota($event, $quota, array $data) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
     $quotaId = $this->getId($quota);
 
     return $this->patch('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/quotas/' . $quotaId . '/', ['data' => $data]);
@@ -168,7 +168,7 @@ class Client {
    * Get sub-events (event series dates).
    */
   public function getSubEvents($event) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
 
     return $this->get('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/subevents/');
   }
@@ -177,7 +177,7 @@ class Client {
    * Create sub-event.
    */
   public function createSubEvent($event, $data) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
 
     return $this->post('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/subevents/', [
       'data' => $data,
@@ -188,7 +188,7 @@ class Client {
    * Update sub-event.
    */
   public function updateSubEvent($event, $subEvent, $data) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
     $subEventId = $this->getId($subEvent);
 
     return $this->patch('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/subevents/' . $subEventId . '/', [
@@ -200,7 +200,7 @@ class Client {
    * Delete sub-event.
    */
   public function deleteSubEvent($event, $subEvent) {
-    $eventSlug = $this->getEventSlug($event);
+    $eventSlug = $this->getSlug($event);
     $subEventId = $this->getId($subEvent);
 
     return $this->delete('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/subevents/' . $subEventId . '/');
@@ -236,6 +236,23 @@ class Client {
     return $this->patch('organizers/' . $this->organizerSlug . '/webhooks/' . $webhook->id . '/', [
       'data' => $data,
     ]);
+  }
+
+  /**
+   * Get order.
+   *
+   * @param string|object $organizer
+   *   The organizer.
+   * @param string|object $event
+   *   The event.
+   * @param string $code
+   *   The code.
+   */
+  public function getOrder($organizer, $event, $code) {
+    $organizerSlug = $this->getSlug($organizer);
+    $eventSlug = $this->getSlug($event);
+
+    return $this->get('organizers/' . $organizerSlug . '/events/' . $eventSlug . '/orders/' . $code . '/');
   }
 
   /**
@@ -330,7 +347,7 @@ class Client {
    * @return string
    *   The event slug.
    */
-  private function getEventSlug($event) {
+  private function getSlug($event) {
     return $event->slug ?? $event;
   }
 
