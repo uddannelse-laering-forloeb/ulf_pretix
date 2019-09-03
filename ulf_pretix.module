@@ -204,7 +204,8 @@ function ulf_pretix_preprocess_node(&$variables) {
     if (
       !empty($pretix['data']['pretix_url']) &&
       !empty($pretix['pretix_organizer_slug']) &&
-      !empty($pretix['pretix_event_slug'])
+      !empty($pretix['pretix_event_slug']) &&
+      $pretix['data']['event']['live'] == true
       ) {
       drupal_add_css(drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css');
       $variables['pretix_widget'] = array(
