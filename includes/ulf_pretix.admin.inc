@@ -32,7 +32,7 @@ function ulf_pretix_admin_settings_form(array $form, array &$form_state) {
 
   $form[Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE] = [
     '#type' => 'textarea',
-    '#title' => t('Order cancelled email template'),
+    '#title' => t('Order canceled email template'),
     '#required' => TRUE,
     '#default_value' => variable_get(Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE),
   ];
