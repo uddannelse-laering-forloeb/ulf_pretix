@@ -165,6 +165,16 @@ class Client {
   }
 
   /**
+   * Get quota availability.
+   */
+  public function getQuotaAvailability($event, $quota) {
+    $eventSlug = $this->getSlug($event);
+    $quotaId = $this->getId($quota);
+
+    return $this->get('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/quotas/' . $quotaId . '/availability/');
+  }
+
+  /**
    * Get sub-events (event series dates).
    */
   public function getSubEvents($event) {

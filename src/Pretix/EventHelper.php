@@ -5,18 +5,11 @@ namespace Drupal\ulf_pretix\Pretix;
 /**
  * Pretix helper.
  */
-class Helper {
+class EventHelper extends AbstractHelper {
   const PRETIX_CONTENT_TYPES = [
     'course',
     'course_educators',
   ];
-
-  /**
-   * Create an instance of the Helper.
-   */
-  public static function create() {
-    return new static();
-  }
 
   /**
    * Validate the the specified event is a valid template event.
@@ -152,7 +145,7 @@ class Helper {
   /**
    * Check if a node is a pretix node.
    */
-  public function isPretixNode($node) {
+  public function isPretixEventNode($node) {
     $type = isset($node->type) ? $node->type : $node;
 
     return in_array($type, self::PRETIX_CONTENT_TYPES);
@@ -172,6 +165,31 @@ class Helper {
       else {
         $node->pretix = $info;
       }
+    }
+  }
+
+  /**
+   *
+   */
+  public function isPretixSubEventItem($item) {
+    return TRUE;
+  }
+
+  /**
+   *
+   */
+  public function setPretixSubEventInfo(array $entities) {
+    return;
+    foreach ($entities as $entity) {
+      $info = $this->loadPretixSubEventInfo($entity);
+      header('Content-type: text/plain');
+      echo var_export([
+        $info,
+        $entity->item_id,
+        $entity->field_name,
+        $entity,
+      ], TRUE);
+      die(__FILE__ . ':' . __LINE__ . ':' . __METHOD__);
     }
   }
 
@@ -253,13 +271,12 @@ class Helper {
   /**
    * Save pretix sub-event info.
    */
-  private function savePretixSubEventInfo($node, $item, $subEvent, array $data = []) {
+  private function savePretixSubEventInfo($item, $subEvent, array $data = []) {
     $data += [
       'subevent' => $subEvent,
     ];
     $info = [
-      'nid' => $node->nid,
-      'item_type' => $item->field_name->value(),
+      'field_name' => $item->field_name->value(),
       'item_id' => (int) $item->item_id->value(),
       'pretix_subevent_id' => $subEvent->id,
       'data' => json_encode($data),
@@ -267,8 +284,7 @@ class Helper {
 
     db_merge('ulf_pretix_subevents')
       ->key([
-        'nid' => $info['nid'],
-        'item_type' => $info['item_type'],
+        'field_name' => $info['field_name'],
         'item_id' => $info['item_id'],
       ])
       ->fields($info)
@@ -279,8 +295,13 @@ class Helper {
 
   /**
    * Load pretix sub-event info from database.
+   *
+   * @param $item
+   *   The field collection item.
+   * @param bool $reset
+   *   If set, data will be read from database.
    */
-  public function loadPretixSubEventInfo($node, $item, $reset = FALSE) {
+  public function loadPretixSubEventInfo($item, $reset = FALSE) {
     if (is_array($item)) {
       $info = [];
       foreach ($item as $i) {
@@ -290,31 +311,34 @@ class Helper {
       return $info;
     }
     else {
-      $nid = (int) $node->nid;
-      $item_type = $item->field_name->value();
-      $item_id = (int) $item->item_id->value();
+      if ($item instanceof \EntityDrupalWrapper) {
+        $field_name = $item->field_name->value();
+        $item_id = (int) $item->item_id->value();
+      }
+      else {
+        $field_name = $item->field_name;
+        $item_id = (int) $item->item_id;
+      }
       $info = &drupal_static(__METHOD__, []);
 
-      if (!isset($info[$nid][$item_type][$item_id]) || $reset) {
+      if (!isset($info[$field_name][$item_id]) || $reset) {
         $record = db_select('ulf_pretix_subevents', 'p')
           ->fields('p')
-          ->condition('nid', $nid, '=')
-          ->condition('item_type', $item_type, '=')
+          ->condition('field_name', $field_name, '=')
           ->condition('item_id', $item_id, '=')
           ->execute()
           ->fetch();
 
         if (!empty($record)) {
-          $info[$nid][$item_type][$item_id] = [
-            'nid' => $record->nid,
-            'item_type' => $record->item_type,
+          $info[$field_name][$item_id] = [
+            'field_name' => $record->field_name,
             'item_id' => (int) $record->item_id,
             'pretix_subevent_id' => (int) $record->pretix_subevent_id,
             'data' => json_decode($record->data, TRUE),
           ];
         }
 
-        return $info[$nid][$item_type][$item_id] ?? NULL;
+        return $info[$field_name][$item_id] ?? NULL;
       }
     }
   }
@@ -552,7 +576,7 @@ class Helper {
    */
   private function synchronizePretixSubEvent($item, $event, $node, $client) {
     $item = entity_metadata_wrapper('field_collection_item', $item);
-    $itemInfo = $this->loadPretixSubEventInfo($node, $item, TRUE);
+    $itemInfo = $this->loadPretixSubEventInfo($item, TRUE);
     $isNewItem = NULL === $itemInfo;
 
     $templateEvent = $this->getPretixTemplateEvent($node);
@@ -588,7 +612,7 @@ class Helper {
       $data = $itemInfo['data']['subevent'];
     }
 
-    $data['name'] = $this->getEventName($node);
+    $data['name'] = ['da' => $this->getEventName($node)];
     $data['date_from'] = $this->formatDate($item->field_pretix_start_date->value());
     $data['presale_start'] = $this->formatDate($item->field_pretix_presale->value());
     $data['location'] = NULL;
@@ -662,7 +686,7 @@ class Helper {
       return $this->apiError($result, 'Cannot update subevent quota');
     }
 
-    $info = $this->savePretixSubEventInfo($node, $item, $subEvent);
+    $info = $this->savePretixSubEventInfo($item, $subEvent);
 
     return [
       'status' => $isNewItem ? 'created' : 'updated',
@@ -681,12 +705,6 @@ class Helper {
     if ($value instanceof \DateTime) {
       return $value;
     }
-
-// header('content-type: text/plain'); echo var_export([
-//   $value,
-//   new \DateTime('@' . $value),
-//   new \DateTime('@' . $value, new \DateTimeZone('Europe/Copenhagen')),
-// ], true); die(__FILE__.':'.__LINE__.':'.__METHOD__);
 
     if (is_numeric($value)) {
       return new \DateTime('@' . $value);
@@ -740,47 +758,6 @@ class Helper {
     }
 
     return NULL;
-  }
-
-  /**
-   * Get pretix client.
-   */
-  public function getPretixClient($node) {
-    $wrapper = entity_metadata_wrapper('user', $node->uid);
-    if (TRUE === $wrapper->field_pretix_enable->value()) {
-      return new Client(
-        $wrapper->field_pretix_url->value(),
-        $wrapper->field_pretix_api_token->value(),
-        $wrapper->field_pretix_organizer_slug->value()
-      );
-    }
-
-    return NULL;
-  }
-
-  /**
-   * Report error.
-   */
-  private function error($message) {
-    watchdog('ulf_pretix', 'Error: %message', [
-      '%message' => $message,
-    ], WATCHDOG_ERROR);
-
-    return ['error' => $message];
-  }
-
-  /**
-   * Report API error.
-   */
-  private function apiError($result, $message) {
-    watchdog('ulf_pretix', 'Error: %message: %code %error', [
-      '%message' => $message,
-      '%code' => $result->code,
-      '%error' => $result->error ?? NULL,
-      '%data' => $result->data ?? NULL,
-    ], WATCHDOG_ERROR);
-
-    return ['error' => $message, 'result' => $result];
   }
 
 }

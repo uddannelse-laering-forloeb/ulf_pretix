@@ -6,7 +6,7 @@
  */
 
 use Drupal\ulf_pretix\Pretix\Client;
-use Drupal\ulf_pretix\Pretix\Helper;
+use Drupal\ulf_pretix\Pretix\EventHelper;
 
 /**
  * Implement hook_form_FORMID_alter().
@@ -32,7 +32,7 @@ function ulf_pretix_form_user_profile_validate($form, &$form_state) {
     $organizer_slug = $values['field_pretix_organizer_slug'][LANGUAGE_NONE][0]['value'];
     $event_slug = $values['field_pretix_default_event_slug'][LANGUAGE_NONE][0]['value'];
 
-    $helper = Helper::create();
+    $helper = EventHelper::create();
     $errors = $helper->validateTemplateEvent($service_url, $api_token, $organizer_slug, $event_slug);
 
     if (null !== $errors) {
@@ -111,7 +111,7 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
     $form['#attached']['css'][] = drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css';
 
     if (isset($form['#node'])) {
-      $helper = Helper::create();
+      $helper = EventHelper::create();
       $node = $form['#node'];
       $form['field_pretix_max_per_order'][LANGUAGE_NONE]['#prefix'] = theme('node__pretix_info', [
         'node' => $node,

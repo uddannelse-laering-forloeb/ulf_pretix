@@ -5,6 +5,8 @@
  * Admin forms, page callbacks and related functions.
  */
 
+use Drupal\ulf_pretix\Pretix\Mailer;
+
 /**
  * Administrative settings form.
  *
@@ -21,11 +23,18 @@
 function ulf_pretix_admin_settings_form(array $form, array &$form_state) {
   $form['#tree'] = TRUE;
 
-  $form['ulf_pretix_order_email_template'] = [
+  $form[Mailer::PRETIX_EVENT_ORDER_PAID_TEMPLATE] = [
     '#type' => 'textarea',
-    '#title' => t('Order email template'),
+    '#title' => t('Order paid email template'),
     '#required' => TRUE,
-    '#default_value' => variable_get('ulf_pretix_order_email_template'),
+    '#default_value' => variable_get(Mailer::PRETIX_EVENT_ORDER_PAID_TEMPLATE),
+  ];
+
+  $form[Mailer::PRETIX_EVENT_ORDER_CANCELLED_TEMPLATE] = [
+    '#type' => 'textarea',
+    '#title' => t('Order cancelled email template'),
+    '#required' => TRUE,
+    '#default_value' => variable_get(Mailer::PRETIX_EVENT_ORDER_CANCELLED_TEMPLATE),
   ];
 
   return system_settings_form($form);

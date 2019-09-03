@@ -54,13 +54,7 @@ function ulf_pretix_schema() {
     'ulf_pretix_subevents' => [
       'description' => 'Table to hold information about pretix subevents.',
       'fields' => [
-        'nid' => [
-          'description' => 'The node id',
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ],
-        'item_type' => [
+        'field_name' => [
           'type' => 'varchar',
           'length' => 255,
           'not null' => FALSE,
@@ -86,7 +80,7 @@ function ulf_pretix_schema() {
           'default' => NULL,
         ],
       ],
-      'primary key' => ['nid', 'item_type', 'item_id'],
+      'primary key' => ['field_name', 'item_id'],
     ],
   ];
 }
