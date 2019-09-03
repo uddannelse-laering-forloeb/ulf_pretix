@@ -354,12 +354,12 @@ class Helper {
     $live = $node->status;
 
     $data = [
-      'name' => ['da' => $name],
+      'name' => ['en' => $name],
       'live' => $live,
       'currency' => 'DKK',
       'date_from' => $this->formatDate($startDate),
       'is_public' => $node->status,
-      'location' => ['da' => $location],
+      'location' => ['en' => $location],
     ];
 
     $isNewEvent = NULL === $info;
