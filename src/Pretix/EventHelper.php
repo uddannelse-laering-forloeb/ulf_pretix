@@ -247,17 +247,18 @@ class EventHelper extends AbstractHelper {
     $existingData = $info['data'] ?? [];
 
     $url = $user->field_pretix_url->value();
-    $existingData += $data
-      + [
+    $data += [
         'pretix_url' => $url,
-        'pretix_organizer_url' => $url,
+        'pretix_event_url' => $this->getPretixEventUrl($node),
+        'pretix_event_shop_url' => $this->getPretixEventShopUrl($node),
+        'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
         'event' => $event,
-      ];
+      ] + $existingData;
     $info = [
       'nid' => $node->nid,
       'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
       'pretix_event_slug' => $event->slug,
-      'data' => json_encode($existingData),
+      'data' => json_encode($data),
     ];
 
     $result = db_merge('ulf_pretix_events')
