@@ -30,12 +30,37 @@ function ulf_pretix_admin_settings_form(array $form, array &$form_state) {
     '#default_value' => variable_get(Mailer::PRETIX_EVENT_ORDER_PAID_TEMPLATE),
   ];
 
-  $form[Mailer::PRETIX_EVENT_ORDER_CANCELLED_TEMPLATE] = [
+  $form[Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE] = [
     '#type' => 'textarea',
     '#title' => t('Order cancelled email template'),
     '#required' => TRUE,
-    '#default_value' => variable_get(Mailer::PRETIX_EVENT_ORDER_CANCELLED_TEMPLATE),
+    '#default_value' => variable_get(Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE),
   ];
 
+  $form['ulf_pretix_event_slug_template'] = [
+    '#type' => 'textfield',
+    '#title' => t('Pretix event slug template'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('ulf_pretix_event_slug_template', '!nid'),
+    '#description' => t('Template for generating pretix event slugs from a node. Must contain <code>!nid</code>!'),
+  ];
+
+  $form['#validate'][] = 'ulf_pretix_admin_settings_form_validate';
+
   return system_settings_form($form);
+}
+
+/**
+ * Admin settings form validation.
+ */
+function ulf_pretix_admin_settings_form_validate($form, &$form_state) {
+  $values = $form_state['values'];
+  if (isset($values['ulf_pretix_event_slug_template'])) {
+    $template = $values['ulf_pretix_event_slug_template'];
+    if (FALSE === strpos($template, '!nid')) {
+      form_set_error('ulf_pretix_event_slug_template', t('Pretix event slug template must contain <code>!nid</code>.'));
+    }
+  }
+
+  // header('content-type: text/plain'); echo var_export($values, true); die(__FILE__.':'.__LINE__.':'.__METHOD__);.
 }

@@ -12,6 +12,27 @@ class EventHelper extends AbstractHelper {
   ];
 
   /**
+   * @var array
+   */
+  private $configuration;
+
+  /**
+   *
+   */
+  public function __construct(array $configuration) {
+    $this->configuration = $configuration;
+  }
+
+  /**
+   *
+   */
+  public static function create() {
+    return new static([
+      'pretix_event_slug_template' => variable_get('ulf_pretix_event_slug_template'),
+    ]);
+  }
+
+  /**
    * Validate the the specified event is a valid template event.
    *
    * @return null|array
@@ -248,12 +269,12 @@ class EventHelper extends AbstractHelper {
 
     $url = $user->field_pretix_url->value();
     $data += [
-        'pretix_url' => $url,
-        'pretix_event_url' => $this->getPretixEventUrl($node),
-        'pretix_event_shop_url' => $this->getPretixEventShopUrl($node),
-        'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
-        'event' => $event,
-      ] + $existingData;
+      'pretix_url' => $url,
+      'pretix_event_url' => $this->getPretixEventUrl($node),
+      'pretix_event_shop_url' => $this->getPretixEventShopUrl($node),
+      'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
+      'event' => $event,
+    ] + $existingData;
     $info = [
       'nid' => $node->nid,
       'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
@@ -502,7 +523,9 @@ class EventHelper extends AbstractHelper {
    * Get pretix event slug.
    */
   private function getEventSlug($node) {
-    return $node->nid;
+    $template = $this->configuration['pretix_event_slug_template'] ?? '!nid';
+
+    return str_replace(['!nid'], [$node->nid], $template);
   }
 
   /**
