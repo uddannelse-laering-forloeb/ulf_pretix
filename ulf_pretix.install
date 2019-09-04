@@ -35,7 +35,7 @@ function ulf_pretix_schema() {
           'default' => NULL,
         ],
         'pretix_event_slug' => [
-          'description' => 'The unique pretix event slug',
+          'description' => 'The pretix event slug',
           'type' => 'varchar',
           'length' => 50,
           'not null' => FALSE,
@@ -49,7 +49,11 @@ function ulf_pretix_schema() {
           'default' => NULL,
         ],
       ],
-      'primary key' => ['nid'],
+      'primary key' => [
+        'nid',
+        'pretix_organizer_slug',
+        'pretix_event_slug',
+      ],
     ],
     'ulf_pretix_subevents' => [
       'description' => 'Table to hold information about pretix subevents.',
@@ -80,7 +84,11 @@ function ulf_pretix_schema() {
           'default' => NULL,
         ],
       ],
-      'primary key' => ['field_name', 'item_id'],
+      'primary key' => [
+        'field_name',
+        'item_id',
+        'pretix_subevent_id',
+      ],
     ],
   ];
 }

@@ -58,9 +58,10 @@ function ulf_pretix_admin_settings_form_validate($form, &$form_state) {
   if (isset($values['ulf_pretix_event_slug_template'])) {
     $template = $values['ulf_pretix_event_slug_template'];
     if (FALSE === strpos($template, '!nid')) {
-      form_set_error('ulf_pretix_event_slug_template', t('Pretix event slug template must contain <code>!nid</code>.'));
+      form_set_error(
+        'ulf_pretix_event_slug_template',
+        t('Pretix event slug template must contain <code>!nid</code>.')
+      );
     }
   }
-
-  // header('content-type: text/plain'); echo var_export($values, true); die(__FILE__.':'.__LINE__.':'.__METHOD__);.
 }

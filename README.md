@@ -21,5 +21,5 @@ The module will add a 'pretix' section on all courses.
 
 ```sh
 composer install
-vendor/bin/phpcs
+composer check-coding-standards
 ```

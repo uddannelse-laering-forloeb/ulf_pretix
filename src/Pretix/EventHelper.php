@@ -12,19 +12,21 @@ class EventHelper extends AbstractHelper {
   ];
 
   /**
+   * The configuration.
+   *
    * @var array
    */
   private $configuration;
 
   /**
-   *
+   * The constructor.
    */
   public function __construct(array $configuration) {
     $this->configuration = $configuration;
   }
 
   /**
-   *
+   * Create an instance of the helper.
    */
   public static function create() {
     return new static([
@@ -133,19 +135,19 @@ class EventHelper extends AbstractHelper {
     }
 
     $actionTypes = [
-      'pretix.event.order.placed',
-      'pretix.event.order.placed.require_approval',
-      'pretix.event.order.paid',
-      'pretix.event.order.canceled',
-      'pretix.event.order.expired',
-      'pretix.event.order.modified',
-      'pretix.event.order.contact.changed',
-      'pretix.event.order.changed.*',
-      'pretix.event.order.refund.created.externally',
-      'pretix.event.order.approved',
-      'pretix.event.order.denied',
-      'pretix.event.checkin',
-      'pretix.event.checkin.reverted',
+      OrderHelper::PRETIX_EVENT_ORDER_PLACED,
+      OrderHelper::PRETIX_EVENT_ORDER_PLACED_REQUIRE_APPROVAL,
+      OrderHelper::PRETIX_EVENT_ORDER_PAID,
+      OrderHelper::PRETIX_EVENT_ORDER_CANCELED,
+      OrderHelper::PRETIX_EVENT_ORDER_EXPIRED,
+      OrderHelper::PRETIX_EVENT_ORDER_MODIFIED,
+      OrderHelper::PRETIX_EVENT_ORDER_CONTACT_CHANGED,
+      OrderHelper::PRETIX_EVENT_ORDER_CHANGED,
+      OrderHelper::PRETIX_EVENT_ORDER_REFUND_CREATED_EXTERNALLY,
+      OrderHelper::PRETIX_EVENT_ORDER_APPROVED,
+      OrderHelper::PRETIX_EVENT_ORDER_DENIED,
+      OrderHelper::PRETIX_EVENT_CHECKIN,
+      OrderHelper::PRETIX_EVENT_CHECKIN_REVERTED,
     ];
 
     $webhookSettings = [
@@ -190,179 +192,11 @@ class EventHelper extends AbstractHelper {
   }
 
   /**
-   *
-   */
-  public function isPretixSubEventItem($item) {
-    return TRUE;
-  }
-
-  /**
-   *
+   * Set pretix event info on a list of item entities.
    */
   public function setPretixSubEventInfo(array $entities) {
-    return;
-    foreach ($entities as $entity) {
-      $info = $this->loadPretixSubEventInfo($entity);
-      header('Content-type: text/plain');
-      echo var_export([
-        $info,
-        $entity->item_id,
-        $entity->field_name,
-        $entity,
-      ], TRUE);
-      die(__FILE__ . ':' . __LINE__ . ':' . __METHOD__);
-    }
-  }
-
-  /**
-   * Load pretix event info from database.
-   */
-  public function loadPretixEventInfo($node, $reset = FALSE) {
-    if (is_array($node)) {
-      $info = [];
-      foreach ($node as $n) {
-        $info[$n->nid] = $this->loadPretixEventInfo($n, $reset);
-      }
-
-      return $info;
-    }
-    else {
-      $nid = $node->nid;
-      $info = &drupal_static(__METHOD__, []);
-
-      if (!isset($info[$nid]) || $reset) {
-        $record = db_select('ulf_pretix_events', 'p')
-          ->fields('p')
-          ->condition('nid', $nid, '=')
-          ->execute()
-          ->fetch();
-
-        if (!empty($record)) {
-          $info[$nid] = [
-            'nid' => $record->nid,
-            'pretix_organizer_slug' => $record->pretix_organizer_slug,
-            'pretix_event_slug' => $record->pretix_event_slug,
-            'data' => json_decode($record->data, TRUE),
-          ];
-        }
-      }
-
-      return $info[$nid] ?? NULL;
-    }
-  }
-
-  /**
-   * Save pretix info on a node.
-   *
-   * @param object $node
-   *   The node.
-   * @param object $user
-   *   The user.
-   * @param object $event
-   *   The event.
-   * @param array $data
-   *   The data.
-   */
-  private function savePretixEventInfo($node, $user, $event, array $data = []) {
-    $info = $this->loadPretixEventInfo($node, TRUE);
-    $existingData = $info['data'] ?? [];
-
-    $url = $user->field_pretix_url->value();
-    $data += [
-      'pretix_url' => $url,
-      'pretix_event_url' => $this->getPretixEventUrl($node),
-      'pretix_event_shop_url' => $this->getPretixEventShopUrl($node),
-      'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
-      'event' => $event,
-    ] + $existingData;
-    $info = [
-      'nid' => $node->nid,
-      'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
-      'pretix_event_slug' => $event->slug,
-      'data' => json_encode($data),
-    ];
-
-    $result = db_merge('ulf_pretix_events')
-      ->key(['nid' => $node->nid])
-      ->fields($info)
-      ->execute();
-
-    return $info;
-  }
-
-  /**
-   * Save pretix sub-event info.
-   */
-  private function savePretixSubEventInfo($item, $subEvent, array $data = []) {
-    $data += [
-      'subevent' => $subEvent,
-    ];
-    $info = [
-      'field_name' => $item->field_name->value(),
-      'item_id' => (int) $item->item_id->value(),
-      'pretix_subevent_id' => $subEvent->id,
-      'data' => json_encode($data),
-    ];
-
-    db_merge('ulf_pretix_subevents')
-      ->key([
-        'field_name' => $info['field_name'],
-        'item_id' => $info['item_id'],
-      ])
-      ->fields($info)
-      ->execute();
-
-    return $info;
-  }
-
-  /**
-   * Load pretix sub-event info from database.
-   *
-   * @param $item
-   *   The field collection item.
-   * @param bool $reset
-   *   If set, data will be read from database.
-   */
-  public function loadPretixSubEventInfo($item, $reset = FALSE) {
-    if (is_array($item)) {
-      $info = [];
-      foreach ($item as $i) {
-        $info[$i->item_id] = $this->loadPretixSubEventInfo($i, $reset);
-      }
-
-      return $info;
-    }
-    else {
-      if ($item instanceof \EntityDrupalWrapper) {
-        $field_name = $item->field_name->value();
-        $item_id = (int) $item->item_id->value();
-      }
-      else {
-        $field_name = $item->field_name;
-        $item_id = (int) $item->item_id;
-      }
-      $info = &drupal_static(__METHOD__, []);
-
-      if (!isset($info[$field_name][$item_id]) || $reset) {
-        $record = db_select('ulf_pretix_subevents', 'p')
-          ->fields('p')
-          ->condition('field_name', $field_name, '=')
-          ->condition('item_id', $item_id, '=')
-          ->execute()
-          ->fetch();
-
-        if (!empty($record)) {
-          $info[$field_name][$item_id] = [
-            'field_name' => $record->field_name,
-            'item_id' => (int) $record->item_id,
-            'pretix_subevent_id' => (int) $record->pretix_subevent_id,
-            'data' => json_decode($record->data, TRUE),
-          ];
-        }
-
-        return $info[$field_name][$item_id] ?? NULL;
-      }
-    }
+    // @TODO
+    // $info = $this->loadPretixSubEventInfo($entity);
   }
 
   /**
@@ -401,7 +235,6 @@ class EventHelper extends AbstractHelper {
 
     $data = [
       'name' => ['en' => $name],
-      'live' => $live,
       'currency' => 'DKK',
       'date_from' => $this->formatDate($startDate),
       'is_public' => $node->status,
@@ -429,6 +262,7 @@ class EventHelper extends AbstractHelper {
     }
 
     $event = $result->data;
+    $eventData['event'] = $event;
     $info = $this->savePretixEventInfo($node, $user, $event, $eventData);
     $subEvents = $this->synchronizePretixSubEvents($event, $node, $client);
 
@@ -437,6 +271,15 @@ class EventHelper extends AbstractHelper {
         return $subEvent;
       }
     }
+
+    // 'live' must be set after all sub-events (and quotas etc.) are created.
+    $result = $client->updateEvent($event->slug, ['live' => $live]);
+    if (isset($result->error)) {
+      return $this->apiError($result, 'Cannot set pretix event live');
+    }
+    $event = $result->data;
+    $eventData['event'] = $event;
+    $info = $this->savePretixEventInfo($node, $user, $event, $eventData);
 
     return [
       'status' => $isNewEvent ? 'created' : 'updated',
@@ -539,7 +382,7 @@ class EventHelper extends AbstractHelper {
    * Get event location.
    */
   private function getEventLocation($node) {
-    return __METHOD__;
+    return '';
   }
 
   /**
@@ -710,7 +553,13 @@ class EventHelper extends AbstractHelper {
       return $this->apiError($result, 'Cannot update subevent quota');
     }
 
-    $info = $this->savePretixSubEventInfo($item, $subEvent);
+    $subEventData = [];
+    $orderHelper = OrderHelper::create()->setClient($client);
+    $availability = $orderHelper->getSubEventAvailability($subEvent);
+    if (!$this->isApiError($result)) {
+      $subEventData['availability'] = $availability->data->results;
+    }
+    $info = $this->savePretixSubEventInfo($item, $subEvent, $subEventData);
 
     return [
       'status' => $isNewItem ? 'created' : 'updated',

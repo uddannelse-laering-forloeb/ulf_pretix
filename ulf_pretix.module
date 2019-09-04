@@ -148,25 +148,7 @@ function ulf_pretix_node_delete($node) {
  * link is always inserted into the field.
  */
 function ulf_pretix_entitycache_node_load($entities) {
-  foreach ($entities as $key => $entity) {
-    if ($entity->type === 'ding_event') {
-      // Uses require once behind the scene.
-      module_load_include('inc', 'ulf_pretix', 'includes/ulf_pretix.api_module');
-
-      $wrapper = entity_metadata_wrapper('node', $entity);
-      $service_settings = variable_get('ulf_pretix', []);
-      $pretix_info = _ulf_pretix_get_pretix_node_info($wrapper->getIdentifier());
-
-      if ($pretix_info['maintain_copy']) {
-        $url = _ulf_pretix_get_event_shop_url($service_settings, $pretix_info['pretix_slug']);
-        $wrapper->field_ding_event_ticket_link->set([
-          'title' => 'Pretix link',
-          'url' => $url,
-          'attributes' => [],
-        ]);
-      }
-    }
-  }
+  // @TODO: Implement this.
 }
 
 /**
@@ -183,8 +165,9 @@ function ulf_pretix_node_load($nodes, $types) {
  * Implements hook_field_collection_item_load().
  */
 function ulf_pretix_field_collection_item_load(array $entities) {
-  $helper = EventHelper::create();
-  $helper->setPretixSubEventInfo($entities);
+  // @TODO
+  // $helper = EventHelper::create();
+  // $helper->setPretixSubEventInfo($entities);
 }
 
 /**

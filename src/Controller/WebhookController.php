@@ -73,23 +73,19 @@ class WebhookController {
     $eventSlug = $payload['event'] ?? NULL;
     $orderCode = $payload['code'] ?? NULL;
 
-    $result = db_select('ulf_pretix_events', 'p')
-      ->fields('p')
-      ->condition('pretix_organizer_slug', $organizerSlug, '=')
-      ->condition('pretix_event_slug', $eventSlug, '=')
-      ->execute()
-      ->fetch();
+    $node = $this->orderHelper->getNode($organizerSlug, $eventSlug);
 
-    if (isset($result->nid)) {
-      $node = node_load($result->nid);
+    if (NULL !== $node) {
       switch ($key) {
         case OrderHelper::PRETIX_EVENT_ORDER_PAID:
-          $subject = t('New pretix order: @event_name', ['@event_name' => $node->title]);
+          $subject = t('New pretix order: @event_name',
+            ['@event_name' => $node->title]);
           $mailKey = Mailer::PRETIX_EVENT_ORDER_PAID_TEMPLATE;
           break;
 
         case OrderHelper::PRETIX_EVENT_ORDER_CANCELED:
-          $subject = t('pretix order canceled: @event_name', ['@event_name' => $node->title]);
+          $subject = t('pretix order canceled: @event_name',
+            ['@event_name' => $node->title]);
           $mailKey = Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE;
           break;
 
@@ -99,9 +95,8 @@ class WebhookController {
 
       $result = $this->orderHelper->setPretixClient($node)
         ->getOrder($organizerSlug, $eventSlug, $orderCode);
-
-      if (isset($result->error)) {
-        return $this->apiError($result, 'Cannot get order');
+      if ($this->orderHelper->isApiError($result)) {
+        return $this->orderHelper->apiError($result, 'Cannot get order');
       }
       $order = $result->data;
       $orderLines = $this->orderHelper->getOrderLines($order);
@@ -118,49 +113,22 @@ class WebhookController {
 
       $result = $this->mailer->send($mailKey, $to, $language, $params);
 
-      return $payload;
-    }
-  }
+      $subEvents = array_column($order->positions, 'subevent');
+      $processed = [];
+      foreach ($subEvents as $subEvent) {
+        if (isset($processed[$subEvent->id])) {
+          continue;
+        }
 
-  /**
-   * Handle order canceled.
-   */
-  private function handleOrderCanceled($payload) {
-    $organizerSlug = $payload['organizer'] ?? NULL;
-    $eventSlug = $payload['event'] ?? NULL;
-    $orderCode = $payload['code'] ?? NULL;
-
-    $result = db_select('ulf_pretix_events', 'p')
-      ->fields('p')
-      ->condition('pretix_organizer_slug', $organizerSlug, '=')
-      ->condition('pretix_event_slug', $eventSlug, '=')
-      ->execute()
-      ->fetch();
-
-    if (isset($result->nid)) {
-      $node = node_load($result->nid);
-      $result = $this->orderHelper->setPretixClient($node)
-        ->getOrder($organizerSlug, $eventSlug, $orderCode);
-
-      if (isset($result->error)) {
-        return $this->apiError($result, 'Cannot get order');
+        $result = $this->orderHelper->getSubEventAvailability($subEvent);
+        if (!$this->orderHelper->isApiError($result)) {
+          $subEventData['availability'] = $result->data->results;
+        }
+        $info = $this->orderHelper->addPretixSubEventInfo($subEvent, $subEventData);
       }
-      $order = $result->data;
-      $orderLines = $this->orderHelper->getOrderLines($order);
-      $content = $this->renderOrder($order, $orderLines);
-
-      $wrapper = entity_metadata_wrapper('node', $node);
-      $to = $wrapper->field_pretix_email_recipient->value();
-      $language = LANGUAGE_NONE;
-      $params = [
-        'subject' => t('Canceled pretix order: @event_name', ['@event_name' => $node->title]),
-        'content' => $content,
-      ];
-
-      $result = $this->mailer->send(Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE, $to, $language, $params);
-
-      return $payload;
     }
+
+    return $payload;
   }
 
   /**
@@ -222,20 +190,6 @@ class WebhookController {
         ? sprintf('%-16s%s', $line[0], $line[1])
         : sprintf('%s', $line[0]);
     }, array_merge(...$blocks)));
-  }
-
-  /**
-   * Report API error.
-   */
-  private function apiError($result, $message) {
-    watchdog('ulf_pretix', 'Error: %message: %code %error', [
-      '%message' => $message,
-      '%code' => $result->code,
-      '%error' => $result->error ?? NULL,
-      '%data' => $result->data ?? NULL,
-    ], WATCHDOG_ERROR);
-
-    return ['error' => $message, 'result' => $result];
   }
 
 }

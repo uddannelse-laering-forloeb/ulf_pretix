@@ -116,4 +116,67 @@ class OrderHelper extends AbstractHelper {
     return $orderLines;
   }
 
+  /**
+   * Get availability information for a pretix event.
+   *
+   * @param object $node
+   *   The node.
+   */
+  public function getAvailability($node) {
+    $this->setPretixClient($node);
+    $event = $node->pretix['pretix_event_slug'];
+
+    $result = $this->client->getSubEvents($event);
+    if ($this->isApiError($result)) {
+      return $this->apiError($result, 'Cannot get sub-events');
+    }
+    $subEvents = array_column($result->data->results, NULL, 'id');
+
+    $result = $this->client->getQuotas($event);
+    if ($this->isApiError($result)) {
+      return $this->apiError($result, 'Cannot get quotas');
+    }
+    $quotas = array_column($result->data->results, NULL, 'id');
+
+    $quotas = array_filter($quotas, function ($quota) use ($subEvents) {
+      return isset($quota->subevent, $subEvents[$quota->subevent]);
+    });
+
+    foreach ($quotas as $quota) {
+      $result = $this->client->getQuotaAvailability($event, $quota);
+      if ($this->isApiError($result)) {
+        return $this->apiError($result, 'Cannot get quota availability');
+      }
+      $quota->availability = $result->data;
+    }
+  }
+
+  /**
+   * Get sub-event availability from pretix.
+   *
+   * @param object $subEvent
+   *   The sub-event.
+   *
+   * @return object
+   *   A pretix API result with quotas enriched with availability information.
+   */
+  public function getSubEventAvailability($subEvent) {
+    $event = $subEvent->event;
+    $quotasResult = $this->client->getQuotas($event, ['query' => ['subevent' => $subEvent->id]]);
+    if ($this->isApiError($quotasResult)) {
+      return $this->apiError($quotasResult, 'Cannot get quotas for sub-event');
+    }
+    $quotas = $quotasResult->data->results;
+
+    foreach ($quotas as $quota) {
+      $result = $this->client->getQuotaAvailability($event, $quota);
+      if ($this->isApiError($result)) {
+        return $this->apiError($result, 'Cannot get quota availability');
+      }
+      $quota->availability = $result->data;
+    }
+
+    return $quotasResult;
+  }
+
 }
