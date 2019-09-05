@@ -32,6 +32,7 @@ function ulf_pretix_permission() {
 function ulf_pretix_secure_permissions($role) {
   $permissions = array(
     'editor' => array(
+      'administer ulf pretix settings',
       'administer ulf pretix user settings',
     ),
   );

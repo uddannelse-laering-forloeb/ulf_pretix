@@ -30,7 +30,7 @@ class EventHelper extends AbstractHelper {
    */
   public static function create() {
     return new static([
-      'pretix_event_slug_template' => variable_get('ulf_pretix_event_slug_template'),
+      'pretix_event_slug_template' => '!nid',
     ]);
   }
 

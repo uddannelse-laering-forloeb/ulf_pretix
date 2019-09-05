@@ -37,14 +37,6 @@ function ulf_pretix_admin_settings_form(array $form, array &$form_state) {
     '#default_value' => variable_get(Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE),
   ];
 
-  $form['ulf_pretix_event_slug_template'] = [
-    '#type' => 'textfield',
-    '#title' => t('Pretix event slug template'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('ulf_pretix_event_slug_template', '!nid'),
-    '#description' => t('Template for generating pretix event slugs from a node. Must contain <code>!nid</code>!'),
-  ];
-
   $form['#validate'][] = 'ulf_pretix_admin_settings_form_validate';
 
   return system_settings_form($form);
