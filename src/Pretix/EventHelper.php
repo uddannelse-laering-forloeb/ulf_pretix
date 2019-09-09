@@ -479,7 +479,7 @@ class EventHelper extends AbstractHelper {
       $data = $itemInfo['data']['subevent'];
     }
 
-    $data['name'] = ['da' => $this->getEventName($node)];
+    $data['name'] = ['en' => $this->getEventName($node)];
     $data['date_from'] = $this->formatDate($item->field_pretix_start_date->value());
     $data['presale_start'] = $this->formatDate($item->field_pretix_presale->value());
     $data['location'] = NULL;
