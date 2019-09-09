@@ -71,14 +71,14 @@ class EventHelper extends AbstractHelper {
     $event = $result->data;
     if (!$event->has_subevents) {
       return [
-        'event_slug' => t('This event does not have subevents.'),
+        'event_slug' => t('This event does not have sub-events.'),
       ];
     }
 
     $result = $client->getSubEvents($event);
     if (isset($result->error) || 200 !== (int) $result->code) {
       return [
-        'event_slug' => t('Cannot get subevents.'),
+        'event_slug' => t('Cannot get sub-events.'),
       ];
     }
 
@@ -94,7 +94,7 @@ class EventHelper extends AbstractHelper {
 
     if (isset($result->error) || 200 !== (int) $result->code) {
       return [
-        'event_slug' => t('Cannot get subevent quotas.'),
+        'event_slug' => t('Cannot get sub-event quotas.'),
       ];
     }
 
@@ -108,7 +108,7 @@ class EventHelper extends AbstractHelper {
     $quota = $quotas->results[0];
     if (1 !== count($quota->items)) {
       return [
-        'event_slug' => t('Event date (subevent) quota must apply to exactly 1 product.'),
+        'event_slug' => t('Event date (sub-event) quota must apply to exactly 1 product.'),
       ];
     }
 
@@ -449,7 +449,7 @@ class EventHelper extends AbstractHelper {
     $templateEvent = $this->getPretixTemplateEvent($node);
     $result = $client->getSubEvents($templateEvent);
     if (isset($result->error) || 0 === $result->data->count) {
-      return $this->apiError($result, 'Cannot get template event subevent');
+      return $this->apiError($result, 'Cannot get template event sub-event');
     }
     $templateSubEvent = $result->data->results[0];
     unset($templateSubEvent->id);
@@ -457,7 +457,7 @@ class EventHelper extends AbstractHelper {
     $product = NULL;
     $data = [];
     if ($isNewItem) {
-      // Get first subevent from template event.
+      // Get first sub-event from template event.
       $result = $client->getItems($event);
       if (isset($result->error) || 0 === $result->data->count) {
         return $this->apiError($result, 'Cannot get template event items');
@@ -496,18 +496,18 @@ class EventHelper extends AbstractHelper {
 
     // Important: meta_data value must be an object!
     $data['meta_data'] = (object) [];
-
+    $subEventData = [];
     if ($isNewItem) {
       $result = $client->createSubEvent($event->slug, $data);
       if (isset($result->error)) {
-        return $this->apiError($result, 'Cannot create subevent');
+        return $this->apiError($result, 'Cannot create sub-event');
       }
     }
     else {
       $subEventId = $itemInfo['pretix_subevent_id'];
       $result = $client->updateSubEvent($event->slug, $subEventId, $data);
       if (isset($result->error)) {
-        return $this->apiError($result, 'Cannot update subevent');
+        return $this->apiError($result, 'Cannot update sub-event');
       }
     }
 
@@ -516,15 +516,15 @@ class EventHelper extends AbstractHelper {
     // Get sub-event quotas.
     $result = $client->getQuotas($event, ['query' => ['subevent' => $subEvent->id]]);
     if (isset($result->error)) {
-      return $this->apiError($result, 'Cannot get subevent quotas');
+      return $this->apiError($result, 'Cannot get sub-event quotas');
     }
 
     if (0 === $result->data->count) {
-      // Create a new quota for the subevent.
+      // Create a new quota for the sub-event.
       $result = $client->getQuotas($templateEvent,
         ['subevent' => $templateSubEvent->id]);
       if (isset($result->error) || 0 === $result->data->count) {
-        return $this->apiError($result, 'Cannot get template subevent quotas');
+        return $this->apiError($result, 'Cannot get template sub-event quotas');
       }
 
       $templateQuota = $result->data->results[0];
@@ -534,14 +534,14 @@ class EventHelper extends AbstractHelper {
       $data['items'] = [$product->id];
       $result = $client->createQuota($event, $data);
       if (isset($result->error)) {
-        return $this->apiError($result, 'Cannot create quota for subevent');
+        return $this->apiError($result, 'Cannot create quota for sub-event');
       }
     }
 
     // Update the quota.
     $result = $client->getQuotas($event, ['query' => ['subevent' => $subEvent->id]]);
     if (isset($result->error) || 1 !== $result->data->count) {
-      return $this->apiError($result, 'Cannot get subevent quota');
+      return $this->apiError($result, 'Cannot get sub-event quota');
     }
 
     $quota = $result->data->results[0];
@@ -550,10 +550,10 @@ class EventHelper extends AbstractHelper {
     $data = ['size' => $size];
     $result = $client->updateQuota($event, $quota, $data);
     if (isset($result->error)) {
-      return $this->apiError($result, 'Cannot update subevent quota');
+      return $this->apiError($result, 'Cannot update sub-event quota');
     }
 
-    $subEventData = [];
+    $subEventData['subevent'] = $subEvent;
     $orderHelper = OrderHelper::create()->setClient($client);
     $availability = $orderHelper->getSubEventAvailability($subEvent);
     if (!$this->isApiError($result)) {
