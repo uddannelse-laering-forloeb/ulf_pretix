@@ -13,7 +13,7 @@
       <dt>
         <?php echo t('Pretix event shop url') ?>
         <?php echo ' ' ?>
-        <?php echo isset($node->pretix['data']['event']['live']) ? t('(shop live)') : t('(shop not live') ?>
+        <?php echo (isset($node->pretix['data']['event']['live']) && $node->pretix['data']['event']['live']) ? t('(shop live)') : t('(shop not live)') ?>
       </dt>
       <dd>
         <?php echo l($node->pretix['data']['pretix_event_shop_url'], $node->pretix['data']['pretix_event_shop_url']) ?>
