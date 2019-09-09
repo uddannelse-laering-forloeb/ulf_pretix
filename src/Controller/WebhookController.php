@@ -124,7 +124,7 @@ class WebhookController {
         if (!$this->orderHelper->isApiError($result)) {
           $subEventData['availability'] = $result->data->results;
         }
-        $info = $this->orderHelper->addPretixSubEventInfo($subEvent, $subEventData);
+        $info = $this->orderHelper->addPretixSubEventInfo(NULL, $subEvent, $subEventData);
       }
     }
 

@@ -120,84 +120,79 @@ abstract class AbstractHelper {
   }
 
   /**
-   * Save pretix info on a node.
+   * Add pretix event.
    *
    * @param object $node
    *   The node.
-   * @param object $user
-   *   The user.
    * @param object $event
    *   The event.
    * @param array $data
    *   The data.
+   * @param bool $reset
+   *   If set, the data will be reset.
+   *
+   * @return array
+   *   The event data.
+   *
+   * @throws \InvalidMergeQueryException
    */
-  protected function savePretixEventInfo($node, $user, $event, array $data = []) {
+  protected function addPretixEventInfo($node, $event, array $data, $reset = FALSE) {
     $info = $this->loadPretixEventInfo($node, TRUE);
-    $existingData = $info['data'] ?? [];
 
-    $url = $user->field_pretix_url->value();
-    $data += [
-      'pretix_url' => $url,
-      'pretix_event_url' => $this->getPretixEventUrl($node),
-      'pretix_event_shop_url' => $this->getPretixEventShopUrl($node),
-      'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
-    ] + $existingData;
-    $info = [
-      'nid' => $node->nid,
-      'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
-      'pretix_event_slug' => $event->slug,
-      'data' => json_encode($data),
-    ];
+    // The values to store in the database.
+    $fields = [];
+    if (NULL === $info || $reset) {
+      $user = entity_metadata_wrapper('user', $node->uid);
+      $fields = [
+        'nid' => $node->nid,
+        'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
+        'pretix_event_slug' => $event->slug,
+      ];
+
+      $pretixUrl = rtrim($user->field_pretix_url->value(), '/');
+      $data += [
+        'pretix_url' => $pretixUrl,
+        'pretix_event_url' => $pretixUrl . '/control/event/' . $fields['pretix_organizer_slug'] . '/' . $fields['pretix_event_slug'] . '/',
+        'pretix_event_shop_url' => $pretixUrl . '/' . $fields['pretix_organizer_slug'] . '/' . $fields['pretix_event_slug'] . '/',
+        'pretix_organizer_slug' => $user->field_pretix_organizer_slug->value(),
+        'pretix_event_slug' => $event->slug,
+        'event' => $event,
+      ];
+    }
+
+    // Add any existing data.
+    $data += $info['data'] ?? [];
+
+    $fields['data'] = json_encode($data);
 
     $result = db_merge('ulf_pretix_events')
       ->key(['nid' => $node->nid])
-      ->fields($info)
+      ->fields($fields)
       ->execute();
 
-    return $info;
+    return $data;
   }
 
   /**
-   * Save pretix sub-event info.
-   */
-  protected function savePretixSubEventInfo($item, $subEvent, array $data = []) {
-    $info = $this->loadPretixSubEventInfo($item, TRUE);
-    $existingData = $info['data'] ?? [];
-
-    $data += $existingData;
-
-    list($fieldName, $itemId) = $this->getItemKeys($item);
-    $info = [
-      'field_name' => $fieldName,
-      'item_id' => $itemId,
-      'pretix_subevent_id' => $this->getId($subEvent),
-      'data' => json_encode($data),
-    ];
-
-    db_merge('ulf_pretix_subevents')
-      ->key([
-        'field_name' => $info['field_name'],
-        'item_id' => $info['item_id'],
-        'pretix_subevent_id' => $info['pretix_subevent_id'],
-      ])
-      ->fields($info)
-      ->execute();
-
-    return $info;
-  }
-
-  /**
-   * Add data to pretix sub-event.
+   * Add pretix sub-event info.
    *
-   * @param object $item
-   *   The item or a sub-event.
+   * @param object|null $item
+   *   The item collection item.
+   * @param object|int $subEvent
+   *   The sub-event (id).
    * @param array $data
-   *   The data to add.
+   *   The data.
+   * @param bool $reset
+   *   If set, the data will be reset.
+   *
+   * @return array
+   *   The sub-event data.
+   *
+   * @throws \InvalidMergeQueryException
    */
-  public function addPretixSubEventInfo($item, array $data) {
-    // Check if item is a sub-event object.
-    if (isset($item->event, $item->id)) {
-      $subEventId = $this->getId($item);
+  public function addPretixSubEventInfo($item, $subEvent, array $data, $reset = FALSE) {
+    if (NULL === $item && isset($subEvent->event, $subEvent->id)) {
+      $subEventId = $this->getId($subEvent);
 
       $result = db_select('ulf_pretix_subevents', 'p')
         ->fields('p')
@@ -208,20 +203,38 @@ abstract class AbstractHelper {
       $item = $result;
     }
 
-    $info = $this->loadPretixSubEventInfo($item, TRUE);
-    $existingData = $info['data'] ?? [];
+    list($fieldName, $itemId) = $this->getItemKeys($item);
+    $subEventId = $this->getId($subEvent);
 
-    $data += $existingData;
-    $info['data'] = json_encode($data);
+    $info = $this->loadPretixSubEventInfo($item, TRUE);
+    // The values to store in the database.
+    $fields = [];
+    if (NULL === $info || $reset) {
+      $fields = [
+        'field_name' => $fieldName,
+        'item_id' => $itemId,
+        'pretix_subevent_id' => $subEventId,
+      ];
+
+      $data += [
+        'pretix_subevent_id' => $subEventId,
+      ];
+    }
+
+    // Add any existing data.
+    $data += $info['data'] ?? [];
+    $fields['data'] = json_encode($data);
 
     db_merge('ulf_pretix_subevents')
       ->key([
-        'field_name' => $info['field_name'],
-        'item_id' => $info['item_id'],
-        'pretix_subevent_id' => $info['pretix_subevent_id'],
+        'field_name' => $fieldName,
+        'item_id' => $itemId,
+        'pretix_subevent_id' => $subEventId,
       ])
-      ->fields($info)
+      ->fields($fields)
       ->execute();
+
+    return $data;
   }
 
   /**
@@ -231,6 +244,9 @@ abstract class AbstractHelper {
    *   The field collection item.
    * @param bool $reset
    *   If set, data will be read from database.
+   *
+   * @return array|null
+   *   The sub-event data.
    */
   public function loadPretixSubEventInfo($item, $reset = FALSE) {
     if (is_array($item)) {
@@ -340,6 +356,28 @@ abstract class AbstractHelper {
     ], WATCHDOG_ERROR);
 
     return ['error' => $message, 'result' => $result];
+  }
+
+  /**
+   * Get pretix event url.
+   */
+  public function getPretixEventShopUrl($node) {
+    $info = $this->loadPretixEventInfo($node);
+
+    return $info['data']['pretix_event_shop_url'] ?? NULL;
+  }
+
+  /**
+   * Get pretix event url.
+   */
+  public function getPretixEventUrl($node, $path = '') {
+    $info = $this->loadPretixEventInfo($node);
+
+    if (isset($info['data']['pretix_event_url'])) {
+      return $info['data']['pretix_event_url'] . $path;
+    }
+
+    return NULL;
   }
 
 }

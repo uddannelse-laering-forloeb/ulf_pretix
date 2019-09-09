@@ -263,7 +263,7 @@ class EventHelper extends AbstractHelper {
 
     $event = $result->data;
     $eventData['event'] = $event;
-    $info = $this->savePretixEventInfo($node, $user, $event, $eventData);
+    $info = $this->addPretixEventInfo($node, $event, $eventData);
     $subEvents = $this->synchronizePretixSubEvents($event, $node, $client);
 
     foreach ($subEvents as $subEvent) {
@@ -279,7 +279,7 @@ class EventHelper extends AbstractHelper {
     }
     $event = $result->data;
     $eventData['event'] = $event;
-    $info = $this->savePretixEventInfo($node, $user, $event, $eventData);
+    $info = $this->addPretixEventInfo($node, $event, $eventData);
 
     return [
       'status' => $isNewEvent ? 'created' : 'updated',
@@ -325,38 +325,6 @@ class EventHelper extends AbstractHelper {
     if (TRUE === $user->field_pretix_enable->value()) {
       $url = rtrim($user->field_pretix_url->value(), '/');
       return $url . '/control/';
-    }
-
-    return NULL;
-  }
-
-  /**
-   * Get pretix event url.
-   */
-  public function getPretixEventUrl($node, $path = '') {
-    $user = entity_metadata_wrapper('user', $node->uid);
-    if (TRUE === $user->field_pretix_enable->value()) {
-      $info = $this->loadPretixEventInfo($node);
-      if (NULL !== $info) {
-        $url = rtrim($user->field_pretix_url->value(), '/');
-        return $url . '/control/event/' . $info['pretix_organizer_slug'] . '/' . $info['pretix_event_slug'] . '/' . $path;
-      }
-    }
-
-    return NULL;
-  }
-
-  /**
-   * Get pretix event url.
-   */
-  public function getPretixEventShopUrl($node) {
-    $user = entity_metadata_wrapper('user', $node->uid);
-    if (TRUE === $user->field_pretix_enable->value()) {
-      $info = $this->loadPretixEventInfo($node);
-      if (NULL !== $info) {
-        $url = rtrim($user->field_pretix_url->value(), '/');
-        return $url . '/' . $info['pretix_organizer_slug'] . '/' . $info['pretix_event_slug'] . '/';
-      }
     }
 
     return NULL;
@@ -452,7 +420,6 @@ class EventHelper extends AbstractHelper {
       return $this->apiError($result, 'Cannot get template event sub-event');
     }
     $templateSubEvent = $result->data->results[0];
-    unset($templateSubEvent->id);
 
     $product = NULL;
     $data = [];
@@ -466,9 +433,11 @@ class EventHelper extends AbstractHelper {
       // Always use the first product.
       $product = $result->data->results[0];
 
-      // Convert template to array.
-      $templateSubEvent = json_decode(json_encode($templateSubEvent), TRUE);
-      $data = $templateSubEvent;
+      // Convert template sub-event to array.
+      $data = json_decode(json_encode($templateSubEvent), TRUE);
+      // Remove the template id.
+      unset($data['id']);
+
       $data['item_price_overrides'] = [
         [
           'item' => $product->id,
@@ -521,8 +490,10 @@ class EventHelper extends AbstractHelper {
 
     if (0 === $result->data->count) {
       // Create a new quota for the sub-event.
-      $result = $client->getQuotas($templateEvent,
-        ['subevent' => $templateSubEvent->id]);
+      $result = $client->getQuotas(
+        $templateEvent,
+        ['subevent' => $templateSubEvent->id]
+      );
       if (isset($result->error) || 0 === $result->data->count) {
         return $this->apiError($result, 'Cannot get template sub-event quotas');
       }
@@ -559,7 +530,7 @@ class EventHelper extends AbstractHelper {
     if (!$this->isApiError($result)) {
       $subEventData['availability'] = $availability->data->results;
     }
-    $info = $this->savePretixSubEventInfo($item, $subEvent, $subEventData);
+    $info = $this->addPretixSubEventInfo($item, $subEvent, $subEventData);
 
     return [
       'status' => $isNewItem ? 'created' : 'updated',
