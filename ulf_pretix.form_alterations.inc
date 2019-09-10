@@ -113,18 +113,23 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
     if (isset($form['#node'])) {
       $helper = EventHelper::create();
       $node = $form['#node'];
-      $form['field_pretix_max_per_order'][LANGUAGE_NONE]['#prefix'] = theme('node__pretix_info', [
-        'node' => $node,
-        'pretix_urls' => [
-          'event_url' => $helper->getPretixEventUrl($node),
-          'event_shop_url' => $helper->getPretixEventShopUrl($node),
-          'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
-        ],
-      ]);
+      // Check that we have a valid node object.
+      if (isset($node->nid)) {
+        $form['field_pretix_date'][LANGUAGE_NONE]['#prefix'] = theme('node__pretix_info', [
+          'node' => $node,
+          'pretix_urls' => [
+            'event_url' => $helper->getPretixEventUrl($node),
+            'event_shop_url' => $helper->getPretixEventShopUrl($node),
+            'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
+          ],
+        ]);
+      }
     }
 
-    $form['field_pretix_out_of_stock'][LANGUAGE_NONE]['#attributes']['disabled'] = TRUE;
-    $form['field_pretix_wait_list'][LANGUAGE_NONE]['#attributes']['disabled'] = TRUE;
+    // Remove these for now.
+    $form['field_pretix_max_per_order']['#access'] = FALSE;
+    $form['field_pretix_out_of_stock']['#access'] = FALSE;
+    $form['field_pretix_wait_list']['#access'] = FALSE;
 
     // Set free for pretix date row if the course is free.
     if($form['field_free'][LANGUAGE_NONE]['#default_value']) {
