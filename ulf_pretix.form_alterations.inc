@@ -125,7 +125,7 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
       $node = $form['#node'];
       // Check that we have a valid node object.
       if (isset($node->nid)) {
-        $form['field_pretix_date'][LANGUAGE_NONE]['#prefix'] = theme('node__pretix_info', [
+        $markup = theme('node__pretix_info', [
           'node' => $node,
           'pretix_urls' => [
             'event_url' => $helper->getPretixEventUrl($node),
@@ -133,6 +133,14 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
             'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
           ],
         ]);
+
+        // Add content at top of pretix group.
+        $form['pretix_info'] = [
+          '#markup' => $markup,
+          '#weight' => -1000,
+        ];
+
+        $form['#group_children']['pretix_info'] = 'group_pretix';
       }
     }
 
