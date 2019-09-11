@@ -26,13 +26,15 @@ function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
     }
   }
 
-  $form['#validate'][] = 'ulf_pretix_form_user_profile_validate';
+  $form['#validate'][] = 'ulf_pretix_form_user_profile_form_validate';
 }
 
 /**
  * User profile form validation.
+ *
+ * @see ulf_pretix_form_user_profile_form_alter().
  */
-function ulf_pretix_form_user_profile_validate($form, &$form_state) {
+function ulf_pretix_form_user_profile_form_validate($form, &$form_state) {
   $values = $form_state['values'];
   if (isset($values['field_pretix_enable'][LANGUAGE_NONE][0]['value']) && 1 === $values['field_pretix_enable'][LANGUAGE_NONE][0]['value']) {
     $service_url = $values['field_pretix_url'][LANGUAGE_NONE][0]['value'];
@@ -151,6 +153,9 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
           'visible' => array(
             ':input[name="field_pretix_date[und][' . $key . '][field_pretix_free][und]"]' => array('checked' => FALSE),
           ),
+          'required' => array(
+            ':input[name="field_pretix_date[und][' . $key . '][field_pretix_free][und]"]' => array('checked' => FALSE),
+          ),
         );
       }
     }
@@ -170,6 +175,29 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
         $form['field_pretix_date'][LANGUAGE_NONE][$latest_element]['field_pretix_free'][LANGUAGE_NONE]['#default_value'] = $initial_free;
         $initial_price = $form_state['values']['field_pretix_date'][LANGUAGE_NONE][0]['field_pretix_price'][LANGUAGE_NONE][0]['value'];
         $form['field_pretix_date'][LANGUAGE_NONE][$latest_element]['field_pretix_price'][LANGUAGE_NONE][0]['value']['#default_value'] = $initial_price;
+      }
+    }
+
+    $form['#validate'][] = 'ulf_pretix_form_validate';
+
+  }
+}
+
+/**
+ * Validation function for course nodes.
+ *
+ * @see ulf_pretix_form_alter().
+ */
+function ulf_pretix_form_validate($form, &$form_state) {
+  $values = $form_state['values'];
+  if (isset($values['field_pretix_date'][LANGUAGE_NONE])) {
+    foreach ($values['field_pretix_date'][LANGUAGE_NONE] as $key => $value) {
+      if (is_numeric($key)) {
+        $is_free = 1 === $value['field_pretix_free'][LANGUAGE_NONE][0]['value'];
+        $price = $value['field_pretix_price'][LANGUAGE_NONE][0]['value'];
+        if (!$is_free && empty($price)) {
+          form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_price', t('Price is required for non-free dates.'));
+        }
       }
     }
   }
