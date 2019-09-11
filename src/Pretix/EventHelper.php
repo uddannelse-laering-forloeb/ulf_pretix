@@ -318,13 +318,18 @@ class EventHelper extends AbstractHelper {
   }
 
   /**
-   * Get pretix url for a user.
+   * Get pretix template event url for a user.
    */
-  public function getPretixUrl($user) {
+  public function getPretixTemplateEventUrl($user, $path = '') {
     $user = entity_metadata_wrapper('user', $user);
     if (TRUE === $user->field_pretix_enable->value()) {
       $url = rtrim($user->field_pretix_url->value(), '/');
-      return $url . '/control/';
+      $organizerSlug = $user->field_pretix_organizer_slug->value();
+      $eventSlug = $user->field_pretix_default_event_slug->value();
+
+      if (isset($url, $organizerSlug, $eventSlug)) {
+        return $url . '/control/event/' . $organizerSlug . '/' . $eventSlug . '/' . $path;
+      }
     }
 
     return NULL;

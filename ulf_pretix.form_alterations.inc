@@ -18,6 +18,14 @@ function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
   $form['field_pretix_organizer_slug']['#access'] = user_access('administer ulf pretix user settings');
   $form['field_pretix_default_event_slug']['#access'] = user_access('administer ulf pretix user settings');
 
+  $user = $form['#user'];
+  if (isset($user->uid)) {
+    $url = EventHelper::create()->getPretixTemplateEventUrl($user);
+    if (null !== $url) {
+      $form['field_pretix_default_event_slug']['#suffix'] = l($url, $url);
+    }
+  }
+
   $form['#validate'][] = 'ulf_pretix_form_user_profile_validate';
 }
 
