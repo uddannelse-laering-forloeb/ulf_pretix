@@ -160,10 +160,11 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
       }
     }
 
+
     // Copy first row values, when creating a new row.
     if (isset($form_state['clicked_button']) && $form_state['clicked_button']['#name'] == 'field_pretix_date_add_more') {
       $date_elements = array_filter(array_keys($form['field_pretix_date']['und']), 'is_numeric');
-      $latest_element = max(array_keys($date_elements));
+      $latest_element = end(array_keys($date_elements));
       if ($latest_element) {
         $initial_spaces = $form_state['values']['field_pretix_date'][LANGUAGE_NONE][0]['field_pretix_spaces'][LANGUAGE_NONE][0]['value'];
         $form['field_pretix_date'][LANGUAGE_NONE][$latest_element]['field_pretix_spaces'][LANGUAGE_NONE][0]['value']['#default_value'] = $initial_spaces;
@@ -174,6 +175,12 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
         $initial_free = $form_state['values']['field_pretix_date'][LANGUAGE_NONE][0]['field_pretix_free'][LANGUAGE_NONE][0]['value'];
         $form['field_pretix_date'][LANGUAGE_NONE][$latest_element]['field_pretix_free'][LANGUAGE_NONE]['#default_value'] = $initial_free;
         $initial_price = $form_state['values']['field_pretix_date'][LANGUAGE_NONE][0]['field_pretix_price'][LANGUAGE_NONE][0]['value'];
+        // @TODO: Use number_field_formatter_view (or something else) for this.
+        $field_info = field_info_field('field_pretix_price');
+        if (isset($field_info['settings'])) {
+          $settings = $field_info['settings'];
+          $initial_price = number_format($initial_price, $settings['scale'], $settings['decimal_separator'], '');
+        }
         $form['field_pretix_date'][LANGUAGE_NONE][$latest_element]['field_pretix_price'][LANGUAGE_NONE][0]['value']['#default_value'] = $initial_price;
       }
     }
