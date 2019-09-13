@@ -120,34 +120,43 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
 
     $form['#attached']['css'][] = drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css';
 
-    if (isset($form['#node'])) {
+    $node = $form['#node'] ?? NULL;
+    // Check that we have a valid node object.
+    if (isset($node->nid)) {
       $helper = EventHelper::create();
-      $node = $form['#node'];
-      // Check that we have a valid node object.
-      if (isset($node->nid)) {
-        $markup = theme('node__pretix_info', [
-          'node' => $node,
-          'pretix_urls' => [
-            'event_url' => $helper->getPretixEventUrl($node),
-            'event_shop_url' => $helper->getPretixEventShopUrl($node),
-            'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
-          ],
-        ]);
+      $markup = theme('node__pretix_info', [
+        'node' => $node,
+        'pretix_urls' => [
+          'event_url' => $helper->getPretixEventUrl($node),
+          'event_shop_url' => $helper->getPretixEventShopUrl($node),
+          'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
+        ],
+      ]);
 
-        // Add content at top of pretix group.
-        $form['pretix_info'] = [
-          '#markup' => $markup,
-          '#weight' => -1000,
+      // Add content at top of pretix group.
+      $form['pretix_info'] = [
+        '#markup' => $markup,
+        '#weight' => -1000,
+      ];
+      $form['#group_children']['pretix_info'] = 'group_pretix';
+
+      $wrapper = entity_metadata_wrapper('node', $node);
+      if (FALSE === $wrapper->field_pretix_synchronize->value()) {
+        $form['field_pretix_synchronize']['#access'] = FALSE;
+        $form['field_pretix_date']['#access'] = FALSE;
+
+        $form['pretix_synchronize_info'] = [
+          '#prefix' => '<div class="messages warning"><div>',
+          '#suffix' => '</div></div>',
+          '#markup' => t(
+            'Note: This event is not syncronized with pretix. Go to <a href="@url">@url</a> to edit the event in pretix.',
+            ['@url' => $helper->getPretixEventUrl($node)]
+          ),
+          '#weight' => -999,
         ];
-
-        $form['#group_children']['pretix_info'] = 'group_pretix';
+        $form['#group_children']['pretix_synchronize_info'] = 'group_pretix';
       }
     }
-
-    // Remove these for now.
-    $form['field_pretix_max_per_order']['#access'] = FALSE;
-    $form['field_pretix_out_of_stock']['#access'] = FALSE;
-    $form['field_pretix_wait_list']['#access'] = FALSE;
 
     // Set free for pretix date row if the course is free.
     if($form['field_free'][LANGUAGE_NONE]['#default_value']) {

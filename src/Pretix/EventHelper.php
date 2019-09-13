@@ -207,72 +207,85 @@ class EventHelper extends AbstractHelper {
     $wrapper = entity_metadata_wrapper('node', $node);
     $user = entity_metadata_wrapper('user', $node->uid);
     $client = $this->getPretixClient($node);
+    $isNewEvent = NULL === $info;
 
     if (NULL === $client) {
       return $this->error('Cannot get client');
     }
 
-    $startDate = NULL;
-    $items = $wrapper->field_pretix_date->value();
-    foreach ($items as $item) {
-      $item = entity_metadata_wrapper('field_collection_item', $item);
-      if ($item->field_pretix_start_date->value()) {
-        if (NULL === $startDate || $item->field_pretix_start_date->value() < $startDate) {
-          $startDate = $item->field_pretix_start_date->value();
+    // Only update new events and events that are syncrhonized with pretix.
+    if ($isNewEvent || TRUE === $wrapper->field_pretix_synchronize->value()) {
+      $startDate = NULL;
+      $items = $wrapper->field_pretix_date->value();
+      foreach ($items as $item) {
+        $item = entity_metadata_wrapper('field_collection_item', $item);
+        if ($item->field_pretix_start_date->value()) {
+          if (NULL === $startDate || $item->field_pretix_start_date->value() < $startDate) {
+            $startDate = $item->field_pretix_start_date->value();
+          }
+        }
+      }
+
+      if (NULL === $startDate) {
+        return $this->error('Cannot get start date for event. pretix event not created.');
+      }
+
+      $name = $this->getEventName($node);
+      $location = $this->getEventLocation($node);
+
+      $data = [
+        'name' => ['en' => $name],
+        'currency' => 'DKK',
+        'date_from' => $this->formatDate($startDate),
+        'is_public' => $node->status,
+        'location' => ['en' => $location],
+      ];
+
+      $eventData = [];
+      if ($isNewEvent) {
+        $data['slug'] = $this->getEventSlug($node);
+        // has_subevents is not cloned from source event.
+        $data['has_subevents'] = TRUE;
+        $templateEventSlug = $user->field_pretix_default_event_slug->value();
+        $result = $client->cloneEvent($templateEventSlug, $data);
+        if (isset($result->error)) {
+          return $this->apiError($result, 'Cannot clone event');
+        }
+        $eventData['template_event_slug'] = $templateEventSlug;
+      }
+      else {
+        $result = $client->updateEvent($info['pretix_event_slug'], $data);
+        if (isset($result->error)) {
+          return $this->apiError($result, 'Cannot update event');
+        }
+      }
+
+      $event = $result->data;
+      $eventData['event'] = $event;
+      $info = $this->addPretixEventInfo($node, $event, $eventData);
+      $subEvents = $this->synchronizePretixSubEvents($event, $node, $client);
+
+      foreach ($subEvents as $subEvent) {
+        if (isset($subEvent['error'])) {
+          return $subEvent;
         }
       }
     }
 
-    if (NULL === $startDate) {
-      return $this->error('Cannot get start date for event. pretix event not created.');
-    }
-
-    $name = $this->getEventName($node);
-    $location = $this->getEventLocation($node);
-    // Events cannot be created as 'live' in Pretix (cf. https://docs.pretix.eu/en/latest/api/resources/events.html#post--api-v1-organizers-(organizer)-events-)
-    // Is this also true for `clone`?
-    $live = $node->status;
-
-    $data = [
-      'name' => ['en' => $name],
-      'currency' => 'DKK',
-      'date_from' => $this->formatDate($startDate),
-      'is_public' => $node->status,
-      'location' => ['en' => $location],
-    ];
-
-    $isNewEvent = NULL === $info;
-    $eventData = [];
-    if ($isNewEvent) {
-      $data['slug'] = $this->getEventSlug($node);
-      // has_subevents is not cloned from source event.
-      $data['has_subevents'] = TRUE;
-      $templateEventSlug = $user->field_pretix_default_event_slug->value();
-      $result = $client->cloneEvent($templateEventSlug, $data);
+    // Get the event even if it's not syncronized with pretix.
+    if (!isset($event) && TRUE !== $wrapper->field_pretix_synchronize->value()) {
+      $result = $client->getEvent($info['pretix_event_slug']);
       if (isset($result->error)) {
-        return $this->apiError($result, 'Cannot clone event');
+        return $this->apiError($result, 'Cannot get event');
       }
-      $eventData['template_event_slug'] = $templateEventSlug;
-    }
-    else {
-      $result = $client->updateEvent($info['pretix_event_slug'], $data);
-      if (isset($result->error)) {
-        return $this->apiError($result, 'Cannot update event');
-      }
-    }
-
-    $event = $result->data;
-    $eventData['event'] = $event;
-    $info = $this->addPretixEventInfo($node, $event, $eventData);
-    $subEvents = $this->synchronizePretixSubEvents($event, $node, $client);
-
-    foreach ($subEvents as $subEvent) {
-      if (isset($subEvent['error'])) {
-        return $subEvent;
-      }
+      $event = $result->data;
     }
 
     // 'live' must be set after all sub-events (and quotas etc.) are created.
+    // Note: 'live' is updated for all events including the ones that are not
+    // syncronized with pretix.
+    $live = $node->status;
+
     $result = $client->updateEvent($event->slug, ['live' => $live]);
     if (isset($result->error)) {
       return $this->apiError($result, 'Cannot set pretix event live');
@@ -284,7 +297,7 @@ class EventHelper extends AbstractHelper {
     return [
       'status' => $isNewEvent ? 'created' : 'updated',
       'info' => $info,
-      'subevents' => $subEvents,
+      'subevents' => $subEvents ?? NULL,
     ];
   }
 
@@ -452,6 +465,10 @@ class EventHelper extends AbstractHelper {
    *
    * @param object $node
    *   The node.
+   * @param object $event
+   *   The event.
+   *
+   * @throws \InvalidMergeQueryException
    */
   private function setEventAvailability($node, $event) {
     $info = $this->loadPretixEventInfo($node, TRUE);

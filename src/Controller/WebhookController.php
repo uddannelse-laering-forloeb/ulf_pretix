@@ -114,18 +114,27 @@ class WebhookController {
 
       $result = $this->mailer->send($mailKey, $to, $language, $params);
 
-      $subEvents = array_column($order->positions, 'subevent');
-      $processed = [];
-      foreach ($subEvents as $subEvent) {
-        if (isset($processed[$subEvent->id])) {
-          continue;
-        }
+      if (TRUE === $wrapper->field_pretix_synchronize->value()) {
+        // @TODO Do we really need the availability info on sub-events?
+        // Having it on the event should be more than enough.
+        $subEvents = array_column($order->positions, 'subevent');
+        $processed = [];
+        foreach ($subEvents as $subEvent) {
+          if (isset($processed[$subEvent->id])) {
+            continue;
+          }
 
-        $result = $this->orderHelper->getSubEventAvailability($subEvent);
-        if (!$this->orderHelper->isApiError($result)) {
-          $subEventData['availability'] = $result->data->results;
+          $result = $this->orderHelper->getSubEventAvailability($subEvent);
+          if (!$this->orderHelper->isApiError($result)) {
+            $subEventData['availability'] = $result->data->results;
+          }
+          if (!empty($subEventData)) {
+            $info = $this->orderHelper->addPretixSubEventInfo(
+              NULL,
+              $subEvent,
+              $subEventData);
+          }
         }
-        $info = $this->orderHelper->addPretixSubEventInfo(NULL, $subEvent, $subEventData);
       }
 
       // Update availability on event node.

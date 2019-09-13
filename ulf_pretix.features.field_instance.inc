@@ -270,7 +270,7 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'field_collection',
       'settings' => array(),
       'type' => 'field_collection_embed',
-      'weight' => 54,
+      'weight' => 55,
     ),
   );
 
@@ -314,72 +314,27 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'html5_tools',
       'settings' => array(),
       'type' => 'emailwidget',
-      'weight' => 55,
+      'weight' => 56,
     ),
   );
 
-  // Exported field_instance: 'node-course-field_pretix_max_per_order'.
-  $field_instances['node-course-field_pretix_max_per_order'] = array(
-    'bundle' => 'course',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 37,
-      ),
-      'full' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_pretix_max_per_order',
-    'label' => 'Max antal pr. ordre',
-    'required' => 0,
-    'settings' => array(
-      'max' => '',
-      'min' => '',
-      'prefix' => '',
-      'suffix' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 0,
-      'module' => 'number',
-      'settings' => array(),
-      'type' => 'number',
-      'weight' => 51,
-    ),
-  );
-
-  // Exported field_instance: 'node-course-field_pretix_out_of_stock'.
-  $field_instances['node-course-field_pretix_out_of_stock'] = array(
+  // Exported field_instance: 'node-course-field_pretix_synchronize'.
+  $field_instances['node-course-field_pretix_synchronize'] = array(
     'bundle' => 'course',
     'default_value' => array(
       0 => array(
-        'value' => 0,
+        'value' => 1,
       ),
     ),
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Kun hvis dette er valgt, vil eventet i pretix automatisk blive opdateret med eventindstillinger på denne side. ',
     'display' => array(
       'default' => array(
         'label' => 'above',
+        'module' => 'list',
         'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 35,
+        'type' => 'list_default',
+        'weight' => 40,
       ),
       'full' => array(
         'label' => 'above',
@@ -395,8 +350,8 @@ function ulf_pretix_field_default_field_instances() {
       ),
     ),
     'entity_type' => 'node',
-    'field_name' => 'field_pretix_out_of_stock',
-    'label' => 'Udsolgt',
+    'field_name' => 'field_pretix_synchronize',
+    'label' => 'Vedligehold event i pretix',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -408,56 +363,7 @@ function ulf_pretix_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 52,
-    ),
-  );
-
-  // Exported field_instance: 'node-course-field_pretix_wait_list'.
-  $field_instances['node-course-field_pretix_wait_list'] = array(
-    'bundle' => 'course',
-    'default_value' => array(
-      0 => array(
-        'value' => 0,
-      ),
-    ),
-    'deleted' => 0,
-    'description' => 'Whether there are users on the waitlist.
-See the actual wait list in Pretix.',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 36,
-      ),
-      'full' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_pretix_wait_list',
-    'label' => 'Venteliste',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'display_label' => 1,
-      ),
-      'type' => 'options_onoff',
-      'weight' => 53,
+      'weight' => 54,
     ),
   );
 
@@ -493,7 +399,7 @@ See the actual wait list in Pretix.',
       'module' => 'field_collection',
       'settings' => array(),
       'type' => 'field_collection_embed',
-      'weight' => 77,
+      'weight' => 81,
     ),
   );
 
@@ -532,67 +438,27 @@ See the actual wait list in Pretix.',
       'module' => 'html5_tools',
       'settings' => array(),
       'type' => 'emailwidget',
-      'weight' => 78,
+      'weight' => 82,
     ),
   );
 
-  // Exported field_instance:
-  // 'node-course_educators-field_pretix_max_per_order'.
-  $field_instances['node-course_educators-field_pretix_max_per_order'] = array(
-    'bundle' => 'course_educators',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 35,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_pretix_max_per_order',
-    'label' => 'Max antal pr. ordre',
-    'required' => 0,
-    'settings' => array(
-      'max' => '',
-      'min' => '',
-      'prefix' => '',
-      'suffix' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 0,
-      'module' => 'number',
-      'settings' => array(),
-      'type' => 'number',
-      'weight' => 74,
-    ),
-  );
-
-  // Exported field_instance: 'node-course_educators-field_pretix_out_of_stock'.
-  $field_instances['node-course_educators-field_pretix_out_of_stock'] = array(
+  // Exported field_instance: 'node-course_educators-field_pretix_synchronize'.
+  $field_instances['node-course_educators-field_pretix_synchronize'] = array(
     'bundle' => 'course_educators',
     'default_value' => array(
       0 => array(
-        'value' => 0,
+        'value' => 1,
       ),
     ),
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Kun hvis dette er valgt, vil eventet i pretix automatisk blive opdateret med eventindstillinger på denne side. ',
     'display' => array(
       'default' => array(
         'label' => 'above',
+        'module' => 'list',
         'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 33,
+        'type' => 'list_default',
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -602,8 +468,8 @@ See the actual wait list in Pretix.',
       ),
     ),
     'entity_type' => 'node',
-    'field_name' => 'field_pretix_out_of_stock',
-    'label' => 'Udsolgt',
+    'field_name' => 'field_pretix_synchronize',
+    'label' => 'Vedligehold event i pretix',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -615,49 +481,7 @@ See the actual wait list in Pretix.',
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 75,
-    ),
-  );
-
-  // Exported field_instance: 'node-course_educators-field_pretix_wait_list'.
-  $field_instances['node-course_educators-field_pretix_wait_list'] = array(
-    'bundle' => 'course_educators',
-    'default_value' => array(
-      0 => array(
-        'value' => 0,
-      ),
-    ),
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 34,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_pretix_wait_list',
-    'label' => 'Venteliste',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'display_label' => 1,
-      ),
-      'type' => 'options_onoff',
-      'weight' => 76,
+      'weight' => 80,
     ),
   );
 
@@ -851,7 +675,7 @@ See the actual wait list in Pretix.',
   t('Enable pretix for this user');
   t('Forsalg');
   t('Gratis');
-  t('Max antal pr. ordre');
+  t('Kun hvis dette er valgt, vil eventet i pretix automatisk blive opdateret med eventindstillinger på denne side. ');
   t('Organizer slug');
   t('Pladser');
   t('Pretix url');
@@ -861,10 +685,7 @@ See the actual wait list in Pretix.',
   t('The full pretix url, e.g. https://pretix.eu/');
   t('The part of the url immediately after the domain name, e.g. "organizer-slug" in "https://pretix.eu/control/organizer/organizer-slug/"');
   t('The part of the url immediately after the organizer slug, e.g. "event-slug" in "https://pretix.eu/control/event/organizer-slug/event-slug/"');
-  t('Udsolgt');
-  t('Venteliste');
-  t('Whether there are users on the waitlist.
-See the actual wait list in Pretix.');
+  t('Vedligehold event i pretix');
 
   return $field_instances;
 }
