@@ -218,6 +218,14 @@ function ulf_pretix_preprocess_node(&$variables) {
       $variables['pretix_widget'] = NULL;
     }
   }
+
+  if (isset($variables['node'])) {
+    $node = $variables['node'];
+    if (isset($node->pretix['data']['available']) && FALSE === $node->pretix['data']['available']) {
+      $variables['ribbon_message'] = t('Sold out');
+      $variables['ribbon_class_names'] = ['warning'];
+    }
+  }
 }
 
 /**

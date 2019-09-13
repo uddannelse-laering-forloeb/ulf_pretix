@@ -4,6 +4,7 @@ namespace Drupal\ulf_pretix\Controller;
 
 use Drupal\ulf_pretix\Pretix\Mailer;
 use Drupal\ulf_pretix\Pretix\OrderHelper;
+use Drupal\ulf_pretix\Pretix\EventHelper;
 
 /**
  * Webhook controller.
@@ -126,6 +127,9 @@ class WebhookController {
         }
         $info = $this->orderHelper->addPretixSubEventInfo(NULL, $subEvent, $subEventData);
       }
+
+      // Update availability on event node.
+      EventHelper::create()->updateEventAvailability($node);
     }
 
     return $payload;

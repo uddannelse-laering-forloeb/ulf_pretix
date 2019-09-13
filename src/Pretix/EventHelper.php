@@ -412,6 +412,68 @@ class EventHelper extends AbstractHelper {
   }
 
   /**
+   * Update event availability for a node.
+   *
+   * @param object $node
+   *   The node.
+   */
+  public function updateEventAvailability($node) {
+    $client = $this->getPretixClient($node);
+    if (isset($node->pretix['pretix_event_slug'])) {
+      $eventSlug = $node->pretix['pretix_event_slug'];
+      $result = $client->getEvent($eventSlug);
+      if ($this->isApiError($result)) {
+        return $this->apiError($result);
+      }
+
+      $event = $result->data;
+
+      $result = $client->getQuotas($event);
+      if ($this->isApiError($result)) {
+        return $this->apiError($result);
+      }
+      $quotas = $result->data->results;
+
+      foreach ($quotas as $quota) {
+        $result = $client->getQuotaAvailability($event, $quota);
+        if ($this->isApiError($result)) {
+          return $this->apiError($result);
+        }
+        $quota->availability = $result->data;
+      }
+
+      $this->addPretixEventInfo($node, $event, ['quotas' => $quotas]);
+      $this->setEventAvailability($node, $event);
+    }
+  }
+
+  /**
+   * Set event availability for on a node.
+   *
+   * @param object $node
+   *   The node.
+   */
+  private function setEventAvailability($node, $event) {
+    $info = $this->loadPretixEventInfo($node, TRUE);
+    if (isset($info['data']['quotas'])) {
+      $available = FALSE;
+      foreach ($info['data']['quotas'] as $quota) {
+        if (isset($quota['availability']['available']) && TRUE === $quota['availability']['available']) {
+          $available = TRUE;
+          break;
+        }
+      }
+
+      if (!isset($info['available']) || $info['available'] !== $available) {
+        $this->addPretixEventInfo($node, $event, ['available' => $available]);
+        // Flush cache for node.
+        $cid = url('node/' . $node->nid, ['absolute' => TRUE]);
+        cache_clear_all($cid, 'cache_page');
+      }
+    }
+  }
+
+  /**
    * Synchronize pretix sub-event.
    */
   private function synchronizePretixSubEvent($item, $event, $node, $client) {
