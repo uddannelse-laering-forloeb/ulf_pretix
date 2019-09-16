@@ -116,6 +116,21 @@ class EventHelper extends AbstractHelper {
   }
 
   /**
+   * Check if user has pretix events.
+   *
+   * @param object $user
+   *   The user.
+   *
+   * @return bool
+   *   True if user has pretix events.
+   */
+  public function userHasPretixEvents($user) {
+    $result = db_query('SELECT count(*) FROM {node} n JOIN {ulf_pretix_events} e ON n.nid = e.nid WHERE n.uid = :uid', ['uid' => $user->uid]);
+
+    return 0 !== (int) $result->fetchField();
+  }
+
+  /**
    * Ensure that the pretix callback webhook exists.
    */
   public function ensureWebhook($url, $apiToken, $organizerSlug) {

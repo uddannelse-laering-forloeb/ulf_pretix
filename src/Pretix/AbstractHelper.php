@@ -34,13 +34,18 @@ abstract class AbstractHelper {
    * Get pretix client.
    */
   public function getPretixClient($node) {
-    $wrapper = entity_metadata_wrapper('user', $node->uid);
-    if (TRUE === $wrapper->field_pretix_enable->value()) {
-      return new Client(
-        $wrapper->field_pretix_url->value(),
-        $wrapper->field_pretix_api_token->value(),
-        $wrapper->field_pretix_organizer_slug->value()
-      );
+    $user = entity_metadata_wrapper('user', $node->uid);
+
+    if (TRUE === $user->field_pretix_enable->value()) {
+      $info = $this->loadPretixEventInfo($node, TRUE);
+      $data = $info['data'] ?? NULL;
+      // pretix_url and pretix_organizer_slug may have changed on the user, so
+      // we give priority to the values stored in the node event info.
+      $url = $data['pretix_url'] ?? $user->field_pretix_url->value();
+      $organizerSlug = $data['pretix_organizer_slug'] ?? $user->field_pretix_organizer_slug->value();
+      $apiToken = $user->field_pretix_api_token->value();
+
+      return new Client($url, $apiToken, $organizerSlug);
     }
 
     return NULL;

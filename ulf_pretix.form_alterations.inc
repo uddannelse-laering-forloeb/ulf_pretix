@@ -21,8 +21,16 @@ function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
   $user = $form['#user'];
   if (isset($user->uid)) {
     $url = EventHelper::create()->getPretixTemplateEventUrl($user);
-    if (null !== $url) {
+    if (NULL !== $url) {
       $form['field_pretix_default_event_slug']['#suffix'] = l($url, $url);
+    }
+
+    // Add warning about changing pretix url and organizer slug.
+    $helper = EventHelper::create();
+    if ($helper->userHasPretixEvents($user)) {
+      $form['field_pretix_url']['#prefix'] = '<div class="messages warning">'
+        . t("User already has pretix events. Do not change pretix url or organizer slug unless you really know what you're doing!")
+        . '</div>';
     }
   }
 
