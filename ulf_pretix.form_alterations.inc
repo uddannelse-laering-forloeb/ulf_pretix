@@ -34,6 +34,26 @@ function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
     }
   }
 
+  // Add link to user manual.
+  $user_manual = variable_get('ulf_pretix_user_manual');
+  if (isset($user_manual['url'])) {
+    $form['pretix_user_manual'] = [
+      '#prefix' => '<div class="messages status">',
+      '#markup' => l(
+        $user_manual['link_text'] ?? t('Read the ULF/pretix user manual'),
+        url($user_manual['url'], ['absolute' => TRUE]), [
+          'attributes' => [
+            'style' => 'display: block',
+            'target' => $user_manual['link_target'] ?? '_self',
+          ],
+        ]
+      ),
+      '#suffix' => '</div>',
+      '#weight' => -1000,
+    ];
+  }
+  $form['#group_children']['pretix_user_manual'] = 'group_pretix';
+
   $form['#validate'][] = 'ulf_pretix_form_user_profile_form_validate';
 }
 

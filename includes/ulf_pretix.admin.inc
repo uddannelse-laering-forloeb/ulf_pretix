@@ -37,6 +37,39 @@ function ulf_pretix_admin_settings_form(array $form, array &$form_state) {
     '#default_value' => variable_get(Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE),
   ];
 
+  $user_manual = variable_get('ulf_pretix_user_manual');
+  $form['ulf_pretix_user_manual'] = [
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    '#title' => t('User manual'),
+
+    'url' => [
+      '#type' => 'textfield',
+      '#title' => t('Url'),
+      '#required' => TRUE,
+      '#default_value' => $user_manual['url'] ?? NULL,
+      '#description' => t('Url to ULF/pretix user manual link.'),
+    ],
+
+    'link_target' => [
+      '#type' => 'select',
+      '#options' => [
+        '_blank' => t('New window'),
+      ],
+      '#empty_option' => t('Same window'),
+      '#title' => t('Link target'),
+      '#default_value' => $user_manual['link_target'] ?? NULL,
+      '#description' => t('Target for user manual link.'),
+    ],
+
+    'link_text' => [
+      '#type' => 'textfield',
+      '#title' => t('Link text'),
+      '#required' => TRUE,
+      '#default_value' => $user_manual['link_text'] ?? t('Read the ULF/pretix user manual'),
+    ],
+  ];
+
   $form['#validate'][] = 'ulf_pretix_admin_settings_form_validate';
 
   return system_settings_form($form);
@@ -47,13 +80,24 @@ function ulf_pretix_admin_settings_form(array $form, array &$form_state) {
  */
 function ulf_pretix_admin_settings_form_validate($form, &$form_state) {
   $values = $form_state['values'];
-  if (isset($values['ulf_pretix_event_slug_template'])) {
-    $template = $values['ulf_pretix_event_slug_template'];
-    if (FALSE === strpos($template, '!nid')) {
+  if (isset($values['ulf_pretix_user_manual']['url'])) {
+    $url = url($values['ulf_pretix_user_manual']['url'], ['absolute' => TRUE]);
+    if (!valid_url($url)) {
       form_set_error(
-        'ulf_pretix_event_slug_template',
-        t('Pretix event slug template must contain <code>!nid</code>.')
+        'ulf_pretix_user_manual][url',
+        t('Please enter a valid url.')
       );
+    }
+    else {
+      $result = drupal_http_request($url, [
+        'method' => 'HEAD',
+      ]);
+      if (200 !== (int) $result->code) {
+        form_set_error(
+          'ulf_pretix_user_manual][url',
+          t('Please enter an exiting url.')
+        );
+      }
     }
   }
 }
