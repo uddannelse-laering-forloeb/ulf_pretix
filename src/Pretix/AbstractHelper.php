@@ -343,6 +343,20 @@ abstract class AbstractHelper {
   }
 
   /**
+   * Test if a result is an error.
+   */
+  public function isError($result) {
+    return isset($result['error']);
+  }
+
+  /**
+   * Test if a result is an error.
+   */
+  public function getErrorData($result) {
+    return ($this->isError($result) && isset($result['result']->data)) ? $result['result']->data : NULL;
+  }
+
+  /**
    * Test if an API result is an error.
    */
   public function isApiError($result) {

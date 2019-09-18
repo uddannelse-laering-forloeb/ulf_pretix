@@ -110,7 +110,7 @@ function ulf_pretix_node_update($node) {
   $helper = EventHelper::create();
   if ($helper->isPretixEventNode($node)) {
     $result = $helper->syncronizePretixEvent($node);
-    if (isset($result['error'])) {
+    if ($helper->isError($result)) {
       drupal_set_message(t('There was a problem updating the event in pretix. Please verify in pretix that all settings for the event are correct.'), 'error');
     }
     else {
@@ -118,6 +118,33 @@ function ulf_pretix_node_update($node) {
       drupal_set_message(t('Successfully updated <a href="@pretix_event_url">the event in pretix</a>.', [
         '@pretix_event_url' => $pretix_event_url,
       ]));
+
+      $live = $node->status;
+      $result = $helper->setEventLive($node, $live);
+      if ($helper->isError($result)) {
+        $data = $helper->getErrorData($result);
+        $errors = isset($data->live) ? implode('; ', $data->live) : NULL;
+        $message = $live
+          ? t('Error setting <a href="@pretix_event_url">the pretix event</a> live: @errors', [
+            '@pretix_event_url' => $pretix_event_url,
+            '@errors' => $errors,
+          ])
+          : t('Error setting <a href="@pretix_event_url">the pretix event</a> not live: @errors', [
+            '@pretix_event_url' => $pretix_event_url,
+            '@errors' => $errors,
+          ]);
+        drupal_set_message($message, 'error');
+      }
+      else {
+        $message = $live
+          ? t('Successfully set <a href="@pretix_event_url">the pretix event</a> live.', [
+            '@pretix_event_url' => $pretix_event_url,
+          ])
+          : t('Successfully set <a href="@pretix_event_url">the pretix event</a> not live.', [
+            '@pretix_event_url' => $pretix_event_url,
+          ]);
+        drupal_set_message($message);
+      }
     }
   }
 }

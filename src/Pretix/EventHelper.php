@@ -315,23 +315,37 @@ class EventHelper extends AbstractHelper {
       $event = $result->data;
     }
 
-    // 'live' must be set after all sub-events (and quotas etc.) are created.
-    // Note: 'live' is updated for all events including the ones that are not
-    // syncronized with pretix.
-    $live = $node->status;
-
-    $result = $client->updateEvent($event->slug, ['live' => $live]);
-    if (isset($result->error)) {
-      return $this->apiError($result, 'Cannot set pretix event live');
-    }
-    $event = $result->data;
-    $eventData['event'] = $event;
-    $info = $this->addPretixEventInfo($node, $event, $eventData);
-
     return [
       'status' => $isNewEvent ? 'created' : 'updated',
       'info' => $info,
       'subevents' => $subEvents ?? NULL,
+    ];
+  }
+
+  /**
+   * Set event live (or not) in pretix.
+   */
+  public function setEventLive($node, $live) {
+    // Note: 'live' is updated for all events including the ones that are not
+    // syncronized with pretix.
+    $info = $this->loadPretixEventInfo($node);
+    $client = $this->getPretixClient($node);
+    $result = $client->getEvent($info['pretix_event_slug']);
+    if ($this->isApiError($result)) {
+      return $this->apiError($result, 'Cannot get event');
+    }
+    $event = $result->data;
+
+    $result = $client->updateEvent($event->slug, ['live' => $live]);
+    if ($this->isApiError($result)) {
+      return $this->apiError($result, $live ? 'Cannot set pretix event live' : 'Cannot set pretix event not live');
+    }
+    $event = $result->data;
+    $info = $this->addPretixEventInfo($node, $event, ['event' => $event]);
+
+    return [
+      'status' => $live ? 'live' : 'not live',
+      'info' => $info,
     ];
   }
 
