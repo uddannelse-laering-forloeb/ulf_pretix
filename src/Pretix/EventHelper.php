@@ -186,7 +186,26 @@ class EventHelper extends AbstractHelper {
   public function isPretixEventNode($node) {
     $type = isset($node->type) ? $node->type : $node;
 
-    return in_array($type, self::PRETIX_CONTENT_TYPES);
+    if (!in_array($type, self::PRETIX_CONTENT_TYPES)) {
+      return FALSE;
+    }
+
+    // Node is a pretix node, but its creating user must also have a pretix
+    // connection.
+    return $this->isPretixUser($node->uid);
+  }
+
+  /**
+   * Check if a user is a pretix user, i.e. has a connection to pretix.
+   */
+  public function isPretixUser($user) {
+    $user = entity_metadata_wrapper('user', $user);
+
+    return $user->field_pretix_enable->value()
+      && $user->field_pretix_url->value()
+      && $user->field_pretix_api_token->value()
+      && $user->field_pretix_organizer_slug->value()
+      && $user->field_pretix_default_event_slug->value();
   }
 
   /**

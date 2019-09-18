@@ -144,14 +144,27 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
   );
 
   // Set default values when the form is loaded.
-  if(in_array($form_id, $pretix_node_forms)) {
+  if (in_array($form_id, $pretix_node_forms)) {
+    global $user;
+
+    $helper = EventHelper::create();
+    $node = $form['#node'] ?? NULL;
+
+    // Disable the pretix group and fields if the node's user does not have a
+    // pretix connection.
+    if (!$helper->isPretixUser($node->uid ?? $user)) {
+      $form['group_pretix']['#access'] = false;
+      foreach ($form['#groups']['group_pretix']->children as $field) {
+        $form[$field]['#access'] = false;
+      }
+
+      return;
+    }
 
     $form['#attached']['css'][] = drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css';
 
-    $node = $form['#node'] ?? NULL;
     // Check that we have a valid node object.
     if (isset($node->nid)) {
-      $helper = EventHelper::create();
       $markup = theme('node__pretix_info', [
         'node' => $node,
         'pretix_urls' => [
