@@ -28,6 +28,10 @@ function ulf_pretix_permission() {
 
 /**
  * Implements hook_secure_permissions().
+ *
+ * @param $role
+ *
+ * @return mixed|null
  */
 function ulf_pretix_secure_permissions($role) {
   $permissions = array(
@@ -37,5 +41,5 @@ function ulf_pretix_secure_permissions($role) {
     ),
   );
 
-  return isset($permissions[$role]) ? $permissions[$role] : NULL;
+  return $permissions[$role] ?? NULL;
 }

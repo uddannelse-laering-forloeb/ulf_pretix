@@ -20,6 +20,9 @@ class EventHelper extends AbstractHelper {
 
   /**
    * The constructor.
+   *
+   * @param array $configuration
+   *   The configuration.
    */
   public function __construct(array $configuration) {
     $this->configuration = $configuration;
@@ -36,6 +39,15 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Validate the the specified event is a valid template event.
+   *
+   * @param string $url
+   *   The url.
+   * @param string $apiToken
+   *   The api token.
+   * @param string $organizerSlug
+   *   The organizer slug.
+   * @param string $eventSlug
+   *   The event slug.
    *
    * @return null|array
    *   If null all is good. Otherwise, returns list of [key, error-message]
@@ -132,6 +144,16 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Ensure that the pretix callback webhook exists.
+   *
+   * @param string $url
+   *   The url.
+   * @param string $apiToken
+   *   The api token.
+   * @param string $organizerSlug
+   *   The organizer slug.
+   *
+   * @return object
+   *   The result from calling the pretix api.
    */
   public function ensureWebhook($url, $apiToken, $organizerSlug) {
     $client = new Client($url, $apiToken, $organizerSlug);
@@ -182,11 +204,17 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Check if a node is a pretix node.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return bool
+   *   True iff the node is a pretix event node.
    */
   public function isPretixEventNode($node) {
-    $type = isset($node->type) ? $node->type : $node;
+    $type = $node->type ?? $node;
 
-    if (!in_array($type, self::PRETIX_CONTENT_TYPES)) {
+    if (!in_array($type, self::PRETIX_CONTENT_TYPES, TRUE)) {
       return FALSE;
     }
 
@@ -197,6 +225,12 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Check if a user is a pretix user, i.e. has a connection to pretix.
+   *
+   * @param object|int $user
+   *   The user or user id.
+   *
+   * @return bool
+   *   True if the user has a defined pretix connection.
    */
   public function isPretixUser($user) {
     $user = entity_metadata_wrapper('user', $user);
@@ -210,13 +244,16 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Set pretix event info on a single node or a list of nodes.
+   *
+   * @param object|array $node
+   *   A single node or a list of nodes.
    */
   public function setPretixEventInfo($node) {
     $info = $this->loadPretixEventInfo($node);
     if (!empty($info)) {
       if (is_array($node)) {
-        foreach ($info as $nid => $info) {
-          $node[$nid]->pretix = $info;
+        foreach ($info as $nid => $data) {
+          $node[$nid]->pretix = $data;
         }
       }
       else {
@@ -226,15 +263,15 @@ class EventHelper extends AbstractHelper {
   }
 
   /**
-   * Set pretix event info on a list of item entities.
-   */
-  public function setPretixSubEventInfo(array $entities) {
-    // @TODO
-    // $info = $this->loadPretixSubEventInfo($entity);
-  }
-
-  /**
    * Update (or create) pretix event based on node.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return array
+   *   The status or an error.
+   *
+   * @throws \InvalidMergeQueryException
    */
   public function syncronizePretixEvent($node) {
     $info = $this->loadPretixEventInfo($node);
@@ -324,6 +361,16 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Set event live (or not) in pretix.
+   *
+   * @param object $node
+   *   The node.
+   * @param bool $live
+   *   The live-ness of the node's event.
+   *
+   * @return array
+   *   The event info.
+   *
+   * @throws \InvalidMergeQueryException
    */
   public function setEventLive($node, $live) {
     // Note: 'live' is updated for all events including the ones that are not
@@ -380,6 +427,14 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Get pretix template event url for a user.
+   *
+   * @param object|int $user
+   *   The user or user id.
+   * @param string $path
+   *   An optional url path.
+   *
+   * @return string|null
+   *   The pretix template url if any.
    */
   public function getPretixTemplateEventUrl($user, $path = '') {
     $user = entity_metadata_wrapper('user', $user);
@@ -398,6 +453,12 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Get pretix event slug.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return string
+   *   The event slug.
    */
   private function getEventSlug($node) {
     $template = $this->configuration['pretix_event_slug_template'] ?? '!nid';
@@ -407,6 +468,12 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Get event name from a node.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return string
+   *   The event name.
    */
   private function getEventName($node) {
     return $node->title;
@@ -414,6 +481,12 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Get event location.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return string
+   *   The event location.
    */
   private function getEventLocation($node) {
     return '';
@@ -428,6 +501,9 @@ class EventHelper extends AbstractHelper {
    *   The node.
    * @param \Drupal\ulf_pretix\Pretix\Client $client
    *   The client.
+   *
+   * @return array
+   *   The sub-event info.
    *
    * @throws \InvalidMergeQueryException
    */
@@ -455,7 +531,7 @@ class EventHelper extends AbstractHelper {
     $result = $client->getSubEvents($event);
     if (isset($result->data->results)) {
       foreach ($result->data->results as $subEvent) {
-        if (!in_array($subEvent->id, $subEventIds)) {
+        if (!in_array($subEvent->id, $subEventIds, TRUE)) {
           $client->deleteSubEvent($event, $subEvent);
         }
         $pretixSubEventIds[] = $subEvent->id;
@@ -477,6 +553,11 @@ class EventHelper extends AbstractHelper {
    *
    * @param object $node
    *   The node.
+   *
+   * @return array|null
+   *   On success, the event info. Otherwise an error.
+   *
+   * @throws \InvalidMergeQueryException
    */
   public function updateEventAvailability($node) {
     $client = $this->getPretixClient($node);
@@ -484,28 +565,31 @@ class EventHelper extends AbstractHelper {
       $eventSlug = $node->pretix['pretix_event_slug'];
       $result = $client->getEvent($eventSlug);
       if ($this->isApiError($result)) {
-        return $this->apiError($result);
+        return $this->apiError($result, 'Cannot get event');
       }
-
       $event = $result->data;
 
       $result = $client->getQuotas($event);
       if ($this->isApiError($result)) {
-        return $this->apiError($result);
+        return $this->apiError($result, 'Cannot get quotas');
       }
       $quotas = $result->data->results;
 
       foreach ($quotas as $quota) {
         $result = $client->getQuotaAvailability($event, $quota);
         if ($this->isApiError($result)) {
-          return $this->apiError($result);
+          return $this->apiError($result, 'Cannot get quota availability');
         }
         $quota->availability = $result->data;
       }
 
-      $this->addPretixEventInfo($node, $event, ['quotas' => $quotas]);
+      $info = $this->addPretixEventInfo($node, $event, ['quotas' => $quotas]);
       $this->setEventAvailability($node, $event);
+
+      return $info;
     }
+
+    return NULL;
   }
 
   /**
@@ -540,13 +624,27 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Synchronize pretix sub-event.
+   *
+   * @param object $item
+   *   The item.
+   * @param object $event
+   *   The event.
+   * @param object $node
+   *   The node.
+   * @param \Drupal\ulf_pretix\Pretix\Client $client
+   *   The client.
+   *
+   * @return array
+   *   On success, the sub-event info. Otherwise an error.
+   *
+   * @throws \InvalidMergeQueryException
    */
-  private function synchronizePretixSubEvent($item, $event, $node, $client) {
+  private function synchronizePretixSubEvent($item, $event, $node, Client $client) {
     $item = entity_metadata_wrapper('field_collection_item', $item);
     $itemInfo = $this->loadPretixSubEventInfo($item, TRUE);
     $isNewItem = NULL === $itemInfo;
 
-    $templateEvent = $this->getPretixTemplateEvent($node);
+    $templateEvent = $this->getPretixTemplateEventSlug($node);
     $result = $client->getSubEvents($templateEvent);
     if (isset($result->error) || 0 === $result->data->count) {
       return $this->apiError($result, 'Cannot get template event sub-event');
@@ -672,6 +770,14 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Get data from some value.
+   *
+   * @param mixed $value
+   *   Something that may be converted to a DateTime.
+   *
+   * @return \DateTime|null
+   *   The date.
+   *
+   * @throws \Exception
    */
   private function getDate($value) {
     if (NULL === $value) {
@@ -691,6 +797,14 @@ class EventHelper extends AbstractHelper {
 
   /**
    * Format a date as a string.
+   *
+   * @param mixed|null $date
+   *   The date.
+   *
+   * @return string|null
+   *   The string representation of the date.
+   *
+   * @throws \Exception
    */
   private function formatDate($date = NULL) {
     $date = $this->getDate($date);
@@ -703,9 +817,15 @@ class EventHelper extends AbstractHelper {
   }
 
   /**
-   * Get pretix template event.
+   * Get pretix template event slug.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return string|null
+   *   The template event slug if any.
    */
-  private function getPretixTemplateEvent($node) {
+  private function getPretixTemplateEventSlug($node) {
     $info = $this->loadPretixEventInfo($node);
 
     return $info['data']['template_event_slug'] ?? NULL;

@@ -43,7 +43,15 @@ class WebhookController {
   /**
    * Handle pretix webhook.
    *
+   * @param string $organizerSlug
+   *   The organizer slug.
+   *
    * @see https://docs.pretix.eu/en/latest/api/webhooks.html#receiving-webhooks
+   *
+   * @return array
+   *   The payload.
+   *
+   * @throws \InvalidMergeQueryException
    */
   public function handle($organizerSlug) {
     if ('POST' !== $_SERVER['REQUEST_METHOD']) {
@@ -68,8 +76,18 @@ class WebhookController {
 
   /**
    * Handle order updated.
+   *
+   * @param array $payload
+   *   The payload.
+   * @param string $action
+   *   The action.
+   *
+   * @return array
+   *   The payload.
+   *
+   * @throws \InvalidMergeQueryException
    */
-  private function handleOrderUpdated(array $payload, $key) {
+  private function handleOrderUpdated(array $payload, $action) {
     $organizerSlug = $payload['organizer'] ?? NULL;
     $eventSlug = $payload['event'] ?? NULL;
     $orderCode = $payload['code'] ?? NULL;
@@ -77,7 +95,7 @@ class WebhookController {
     $node = $this->orderHelper->getNode($organizerSlug, $eventSlug);
 
     if (NULL !== $node) {
-      switch ($key) {
+      switch ($action) {
         case OrderHelper::PRETIX_EVENT_ORDER_PAID:
           $subject = t('New pretix order: @event_name',
             ['@event_name' => $node->title]);
@@ -198,7 +216,7 @@ class WebhookController {
       $blocks[] = $block;
     }
 
-    return implode(PHP_EOL, array_map(function ($line) {
+    return implode(PHP_EOL, array_map(static function ($line) {
       return 2 === count($line)
         ? sprintf('%-16s%s', $line[0], $line[1])
         : sprintf('%s', $line[0]);

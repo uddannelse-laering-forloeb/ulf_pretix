@@ -23,6 +23,12 @@ abstract class AbstractHelper {
 
   /**
    * Set pretix client.
+   *
+   * @param \Drupal\ulf_pretix\Pretix\Client $client
+   *   The client.
+   *
+   * @return \Drupal\ulf_pretix\Pretix\AbstractHelper
+   *   The helper.
    */
   public function setClient(Client $client) {
     $this->client = $client;
@@ -32,6 +38,12 @@ abstract class AbstractHelper {
 
   /**
    * Get pretix client.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return \Drupal\ulf_pretix\Pretix\Client|null
+   *   The client if any.
    */
   public function getPretixClient($node) {
     $user = entity_metadata_wrapper('user', $node->uid);
@@ -53,6 +65,12 @@ abstract class AbstractHelper {
 
   /**
    * Set pretix client.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return \Drupal\ulf_pretix\Pretix\AbstractHelper
+   *   The helper.
    */
   public function setPretixClient($node) {
     $this->client = $this->getPretixClient($node);
@@ -89,6 +107,14 @@ abstract class AbstractHelper {
 
   /**
    * Load pretix event info from database.
+   *
+   * @param object $node
+   *   The node.
+   * @param bool $reset
+   *   If set, data will be reset (from database).
+   *
+   * @return array|null
+   *   The info if any.
    */
   public function loadPretixEventInfo($node, $reset = FALSE) {
     if (is_array($node)) {
@@ -99,29 +125,28 @@ abstract class AbstractHelper {
 
       return $info;
     }
-    else {
-      $nid = $node->nid;
-      $info = &drupal_static(__METHOD__, []);
 
-      if (!isset($info[$nid]) || $reset) {
-        $record = db_select('ulf_pretix_events', 'p')
-          ->fields('p')
-          ->condition('nid', $nid, '=')
-          ->execute()
-          ->fetch();
+    $nid = $node->nid;
+    $info = &drupal_static(__METHOD__, []);
 
-        if (!empty($record)) {
-          $info[$nid] = [
-            'nid' => $record->nid,
-            'pretix_organizer_slug' => $record->pretix_organizer_slug,
-            'pretix_event_slug' => $record->pretix_event_slug,
-            'data' => json_decode($record->data, TRUE),
-          ];
-        }
+    if ($reset || !isset($info[$nid])) {
+      $record = db_select('ulf_pretix_events', 'p')
+        ->fields('p')
+        ->condition('nid', $nid, '=')
+        ->execute()
+        ->fetch();
+
+      if (!empty($record)) {
+        $info[$nid] = [
+          'nid' => $record->nid,
+          'pretix_organizer_slug' => $record->pretix_organizer_slug,
+          'pretix_event_slug' => $record->pretix_event_slug,
+          'data' => json_decode($record->data, TRUE),
+        ];
       }
-
-      return $info[$nid] ?? NULL;
     }
+
+    return $info[$nid] ?? NULL;
   }
 
   /**
@@ -262,30 +287,29 @@ abstract class AbstractHelper {
 
       return $info;
     }
-    else {
-      list($fieldName, $itemId) = $this->getItemKeys($item);
-      $info = &drupal_static(__METHOD__, []);
 
-      if (!isset($info[$fieldName][$itemId]) || $reset) {
-        $record = db_select('ulf_pretix_subevents', 'p')
-          ->fields('p')
-          ->condition('field_name', $fieldName, '=')
-          ->condition('item_id', $itemId, '=')
-          ->execute()
-          ->fetch();
+    list($fieldName, $itemId) = $this->getItemKeys($item);
+    $info = &drupal_static(__METHOD__, []);
 
-        if (!empty($record)) {
-          $info[$fieldName][$itemId] = [
-            'field_name' => $record->field_name,
-            'item_id' => (int) $record->item_id,
-            'pretix_subevent_id' => (int) $record->pretix_subevent_id,
-            'data' => json_decode($record->data, TRUE),
-          ];
-        }
+    if ($reset || !isset($info[$fieldName][$itemId])) {
+      $record = db_select('ulf_pretix_subevents', 'p')
+        ->fields('p')
+        ->condition('field_name', $fieldName, '=')
+        ->condition('item_id', $itemId, '=')
+        ->execute()
+        ->fetch();
 
-        return $info[$fieldName][$itemId] ?? NULL;
+      if (!empty($record)) {
+        $info[$fieldName][$itemId] = [
+          'field_name' => $record->field_name,
+          'item_id' => (int) $record->item_id,
+          'pretix_subevent_id' => (int) $record->pretix_subevent_id,
+          'data' => json_decode($record->data, TRUE),
+        ];
       }
     }
+
+    return $info[$fieldName][$itemId] ?? NULL;
   }
 
   /**
@@ -326,6 +350,12 @@ abstract class AbstractHelper {
 
   /**
    * Get id.
+   *
+   * @param object|scalar $object
+   *   The object or object id.
+   *
+   * @return mixed
+   *   The object id.
    */
   private function getId($object) {
     return $object->id ?? $object;
@@ -333,6 +363,12 @@ abstract class AbstractHelper {
 
   /**
    * Report error.
+   *
+   * @param string $message
+   *   The message.
+   *
+   * @return array
+   *   The error.
    */
   protected function error($message) {
     watchdog('ulf_pretix', 'Error: %message', [
@@ -344,20 +380,38 @@ abstract class AbstractHelper {
 
   /**
    * Test if a result is an error.
+   *
+   * @param array $result
+   *   The result.
+   *
+   * @return bool
+   *   True iff the result is an arror.
    */
-  public function isError($result) {
+  public function isError(array $result) {
     return isset($result['error']);
   }
 
   /**
-   * Test if a result is an error.
+   * Get data from an error.
+   *
+   * @param array $result
+   *   The result.
+   *
+   * @return object|null
+   *   The error data if any.
    */
-  public function getErrorData($result) {
+  public function getErrorData(array $result) {
     return ($this->isError($result) && isset($result['result']->data)) ? $result['result']->data : NULL;
   }
 
   /**
    * Test if an API result is an error.
+   *
+   * @param object $result
+   *   The result.
+   *
+   * @return bool
+   *   True iff the result is an error.
    */
   public function isApiError($result) {
     return isset($result->error);
@@ -365,6 +419,14 @@ abstract class AbstractHelper {
 
   /**
    * Report API error.
+   *
+   * @param object $result
+   *   The result.
+   * @param string $message
+   *   The message.
+   *
+   * @return array
+   *   The error.
    */
   public function apiError($result, $message) {
     watchdog('ulf_pretix', 'Error: %message: %code %error', [
@@ -379,6 +441,12 @@ abstract class AbstractHelper {
 
   /**
    * Get pretix event url.
+   *
+   * @param object $node
+   *   The node.
+   *
+   * @return string|null
+   *   The pretix event shop url if any.
    */
   public function getPretixEventShopUrl($node) {
     $info = $this->loadPretixEventInfo($node);
@@ -388,6 +456,14 @@ abstract class AbstractHelper {
 
   /**
    * Get pretix event url.
+   *
+   * @param object $node
+   *   The node.
+   * @param string $path
+   *   An optional url path.
+   *
+   * @return string|null
+   *   The pretix event url if any.
    */
   public function getPretixEventUrl($node, $path = '') {
     $info = $this->loadPretixEventInfo($node);

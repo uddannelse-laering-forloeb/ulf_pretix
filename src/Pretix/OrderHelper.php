@@ -29,6 +29,9 @@ class OrderHelper extends AbstractHelper {
    *   The event (slug).
    * @param string $orderCode
    *   The order code.
+   *
+   * @return array|object
+   *   The pretix order object or an error.
    */
   public function getOrder($organizer, $event, $orderCode) {
     // Get order.
@@ -90,6 +93,8 @@ class OrderHelper extends AbstractHelper {
    *
    * @return array
    *   The order lines.
+   *
+   * @throws \Exception
    */
   public function getOrderLines($order) {
     $orderLines = [];
@@ -121,6 +126,9 @@ class OrderHelper extends AbstractHelper {
    *
    * @param object $node
    *   The node.
+   *
+   * @return array
+   *   The node's event's quotas.
    */
   public function getAvailability($node) {
     $this->setPretixClient($node);
@@ -138,7 +146,7 @@ class OrderHelper extends AbstractHelper {
     }
     $quotas = array_column($result->data->results, NULL, 'id');
 
-    $quotas = array_filter($quotas, function ($quota) use ($subEvents) {
+    $quotas = array_filter($quotas, static function ($quota) use ($subEvents) {
       return isset($quota->subevent, $subEvents[$quota->subevent]);
     });
 
@@ -149,6 +157,8 @@ class OrderHelper extends AbstractHelper {
       }
       $quota->availability = $result->data;
     }
+
+    return $quotas;
   }
 
   /**

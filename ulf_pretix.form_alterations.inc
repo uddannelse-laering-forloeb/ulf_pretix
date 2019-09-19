@@ -10,6 +10,9 @@ use Drupal\ulf_pretix\Pretix\EventHelper;
 
 /**
  * Implement hook_form_FORMID_alter().
+ *
+ * @param $form
+ * @param $form_state
  */
 function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
   $form['field_pretix_enable']['#access'] = user_access('administer ulf pretix user settings');
@@ -61,6 +64,8 @@ function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
  * User profile form validation.
  *
  * @see ulf_pretix_form_user_profile_form_alter().
+ * @param $form
+ * @param $form_state
  */
 function ulf_pretix_form_user_profile_form_validate($form, &$form_state) {
   $values = $form_state['values'];
@@ -111,6 +116,7 @@ function ulf_pretix_form_user_profile_form_validate($form, &$form_state) {
 
 /**
  * Implements hook_field_group_build_pre_render_alter().
+ * @param $element
  */
 function ulf_pretix_field_group_build_pre_render_alter(&$element) {
   // ID needed due to https://www.drupal.org/project/field_group/issues/2318197
@@ -136,6 +142,10 @@ function ulf_pretix_field_group_build_pre_render_alter(&$element) {
 
 /**
  * Implement hook_form_alter().
+ * @param $form
+ * @param $form_state
+ * @param $form_id
+ * @throws \Exception
  */
 function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
   $pretix_node_forms = array(
@@ -144,7 +154,7 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
   );
 
   // Set default values when the form is loaded.
-  if (in_array($form_id, $pretix_node_forms)) {
+  if (in_array($form_id, $pretix_node_forms, TRUE)) {
     global $user;
 
     $helper = EventHelper::create();
@@ -252,6 +262,8 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
  * Validation function for course nodes.
  *
  * @see ulf_pretix_form_alter().
+ * @param $form
+ * @param $form_state
  */
 function ulf_pretix_form_validate($form, &$form_state) {
   $values = $form_state['values'];
