@@ -88,16 +88,5 @@ function ulf_pretix_admin_settings_form_validate($form, &$form_state) {
         t('Please enter a valid url.')
       );
     }
-    else {
-      $result = drupal_http_request($url, [
-        'method' => 'HEAD',
-      ]);
-      if (200 !== (int) $result->code) {
-        form_set_error(
-          'ulf_pretix_user_manual][url',
-          t('Please enter an exiting url.')
-        );
-      }
-    }
   }
 }
