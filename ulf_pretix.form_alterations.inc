@@ -37,6 +37,14 @@ function ulf_pretix_form_user_profile_form_alter(&$form, &$form_state) {
     }
   }
 
+  // Set default value pretix url if empty
+  if (empty($form['field_pretix_url'][LANGUAGE_NONE][0]['value']['#default_value'])) {
+    $field = field_info_instance('user', $form['field_pretix_url'][LANGUAGE_NONE][0]['value']['#field_name'], 'user');
+    if (isset($field['default_value'][0]['value'])) {
+      $form['field_pretix_url'][LANGUAGE_NONE][0]['value']['#default_value'] = $field['default_value'][0]['value'];
+    }
+  }
+
   // Add link to user manual.
   $user_manual = variable_get('ulf_pretix_user_manual');
   if (isset($user_manual['url'])) {
