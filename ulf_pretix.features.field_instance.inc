@@ -525,7 +525,7 @@ function ulf_pretix_field_default_field_instances() {
       ),
     ),
     'deleted' => 0,
-    'description' => 'The part of the url immediately after the organizer slug, e.g. "event-slug" in "https://pretix.eu/control/event/organizer-slug/event-slug/"',
+    'description' => 'The part of the url immediately after the organizer short form, e.g. "event-short-name" in "https://pretix.eu/control/event/organizer-short-name/event-short-name/"',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -536,7 +536,7 @@ function ulf_pretix_field_default_field_instances() {
     ),
     'entity_type' => 'user',
     'field_name' => 'field_pretix_default_event_slug',
-    'label' => 'Default event slug',
+    'label' => 'Default event short form',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -596,7 +596,7 @@ function ulf_pretix_field_default_field_instances() {
     'bundle' => 'user',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The part of the url immediately after the domain name, e.g. "organizer-slug" in "https://pretix.eu/control/organizer/organizer-slug/"',
+    'description' => 'The part of the url immediately after the domain name, e.g. "organizer-short-name" in "https://pretix.eu/control/organizer/organizer-short-name/"',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -607,7 +607,7 @@ function ulf_pretix_field_default_field_instances() {
     ),
     'entity_type' => 'user',
     'field_name' => 'field_pretix_organizer_slug',
-    'label' => 'Organizer slug',
+    'label' => 'Organizer short form',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -665,22 +665,22 @@ function ulf_pretix_field_default_field_instances() {
   // Included for use with string extractors like potx.
   t('API token');
   t('Dato');
-  t('Default event slug');
+  t('Default event short form');
   t('Email recipient');
   t('Enable pretix');
   t('Enable pretix for this user');
   t('Forsalg');
   t('Gratis');
   t('Kun hvis dette er valgt, vil eventet i pretix automatisk blive opdateret med eventindstillinger på denne side. ');
-  t('Organizer slug');
+  t('Organizer short form');
   t('Pladser');
   t('Pretix url');
   t('Pris');
   t('Starttidspunkt');
   t('The API token is found in the pretix configuration');
   t('The full pretix url, e.g. https://pretix.eu/');
-  t('The part of the url immediately after the domain name, e.g. "organizer-slug" in "https://pretix.eu/control/organizer/organizer-slug/"');
-  t('The part of the url immediately after the organizer slug, e.g. "event-slug" in "https://pretix.eu/control/event/organizer-slug/event-slug/"');
+  t('The part of the url immediately after the domain name, e.g. "organizer-short-name" in "https://pretix.eu/control/organizer/organizer-short-name/"');
+  t('The part of the url immediately after the organizer short form, e.g. "event-short-name" in "https://pretix.eu/control/event/organizer-short-name/event-short-name/"');
   t('Vedligehold event i pretix');
 
   return $field_instances;
