@@ -95,27 +95,23 @@ function ulf_pretix_field_formatter_info() {
  * Implements hook_node_insert().
  */
 function ulf_pretix_node_insert($node) {
-  $helper = EventHelper::create();
-  if ($helper->isPretixEventNode($node)) {
-    $result = $helper->syncronizePretixEvent($node);
-    if (isset($result['error'])) {
-      drupal_set_message(t('Error creating event in pretix: %message', [
-        '%message' => $result['error'],
-      ]), 'error');
-    }
-    else {
-      $pretix_event_url = $helper->getPretixEventUrl($node);
-      drupal_set_message(t('Successfully created <a href="@pretix_event_url">event in pretix</a>.', [
-        '@pretix_event_url' => $pretix_event_url,
-      ]));
-    }
-  }
+  _ulf_synchronize_pretix_event($node);
 }
 
 /**
  * Implements hook_node_update().
  */
 function ulf_pretix_node_update($node) {
+  _ulf_synchronize_pretix_event($node);
+}
+
+/**
+ * Synchronize pretix event with node.
+ *
+ * @param object $node
+ *   The node.
+ */
+function _ulf_synchronize_pretix_event($node) {
   $helper = EventHelper::create();
   if ($helper->isPretixEventNode($node)) {
     $result = $helper->syncronizePretixEvent($node);
@@ -126,7 +122,7 @@ function ulf_pretix_node_update($node) {
       $pretix_event_url = $helper->getPretixEventUrl($node);
       drupal_set_message(t('Successfully updated <a href="@pretix_event_url">the event in pretix</a>.', [
         '@pretix_event_url' => $pretix_event_url,
-      ]));
+      ]), 'status', FALSE);
 
       $live = $node->status;
       $result = $helper->setEventLive($node, $live);
@@ -142,7 +138,7 @@ function ulf_pretix_node_update($node) {
             '@pretix_event_url' => $pretix_event_url,
             '@errors' => $errors,
           ]);
-        drupal_set_message($message, 'error');
+        drupal_set_message($message, 'error', FALSE);
       }
       else {
         $message = $live
@@ -152,7 +148,7 @@ function ulf_pretix_node_update($node) {
           : t('Successfully set <a href="@pretix_event_url">the pretix event</a> not live.', [
             '@pretix_event_url' => $pretix_event_url,
           ]);
-        drupal_set_message($message);
+        drupal_set_message($message, 'status', FALSE);
       }
     }
   }
