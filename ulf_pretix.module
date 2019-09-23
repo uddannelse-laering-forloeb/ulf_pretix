@@ -203,8 +203,16 @@ function ulf_pretix_theme() {
  * Implements hook_preprocees_node().
  */
 function ulf_pretix_preprocess_node(&$variables) {
-  if (!empty($variables['pretix']['data'])) {
-    $data = $variables['pretix']['data'];
+  // Check if we should show a pretix shop widget.
+  $widgetNode = node_load($variables['nid']);
+  // We may have to show widget from another node.
+  $wrapper = entity_metadata_wrapper('node', $widgetNode);
+  if (!empty($wrapper->field_pretix_show_widget_from->value())) {
+    $widgetNode = $wrapper->field_pretix_show_widget_from->value();
+  }
+  if (!empty($widgetNode->pretix['data'])) {
+    // Render the pretix widget if event is live.
+    $data = $widgetNode->pretix['data'];
     if (TRUE === $data['event']['live']
       && isset($data['pretix_url'],
         $data['pretix_organizer_slug'],

@@ -270,7 +270,7 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'field_collection',
       'settings' => array(),
       'type' => 'field_collection_embed',
-      'weight' => 55,
+      'weight' => 56,
     ),
   );
 
@@ -313,7 +313,53 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'html5_tools',
       'settings' => array(),
       'type' => 'emailwidget',
-      'weight' => 56,
+      'weight' => 57,
+    ),
+  );
+
+  // Exported field_instance: 'node-course-field_pretix_show_widget_from'.
+  $field_instances['node-course-field_pretix_show_widget_from'] = array(
+    'bundle' => 'course',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Show pretix widget from another course.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 43,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_show_widget_from',
+    'label' => 'Show widget from',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 55,
     ),
   );
 
@@ -376,7 +422,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -397,7 +443,7 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'field_collection',
       'settings' => array(),
       'type' => 'field_collection_embed',
-      'weight' => 81,
+      'weight' => 82,
     ),
   );
 
@@ -435,7 +481,48 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'html5_tools',
       'settings' => array(),
       'type' => 'emailwidget',
-      'weight' => 82,
+      'weight' => 83,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-course_educators-field_pretix_show_widget_from'.
+  $field_instances['node-course_educators-field_pretix_show_widget_from'] = array(
+    'bundle' => 'course_educators',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 39,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_show_widget_from',
+    'label' => 'Show widget from',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 81,
     ),
   );
 
@@ -454,7 +541,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -676,6 +763,8 @@ function ulf_pretix_field_default_field_instances() {
   t('Pladser');
   t('Pretix url');
   t('Pris');
+  t('Show pretix widget from another course.');
+  t('Show widget from');
   t('Starttidspunkt');
   t('The API token is found in the pretix configuration');
   t('The full pretix url, e.g. https://pretix.eu/');
