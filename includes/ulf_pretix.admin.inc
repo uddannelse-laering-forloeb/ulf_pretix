@@ -77,8 +77,13 @@ function ulf_pretix_admin_settings_form(array $form, array &$form_state) {
 
 /**
  * Admin settings form validation.
+ *
+ * @param array $form
+ *   The form.
+ * @param array $form_state
+ *   The form state.
  */
-function ulf_pretix_admin_settings_form_validate($form, &$form_state) {
+function ulf_pretix_admin_settings_form_validate(array $form, array &$form_state) {
   $values = $form_state['values'];
   if (isset($values['ulf_pretix_user_manual']['url'])) {
     $url = url($values['ulf_pretix_user_manual']['url'], ['absolute' => TRUE]);

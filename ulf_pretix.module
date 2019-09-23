@@ -43,6 +43,9 @@ function ulf_pretix_menu() {
 
 /**
  * Deliver JSON result.
+ *
+ * @param mixed $result
+ *   The result.
  */
 function ulf_pretix_deliver_json($result) {
   drupal_json_output($result);
@@ -51,6 +54,12 @@ function ulf_pretix_deliver_json($result) {
 
 /**
  * Menu callback.
+ *
+ * @param string $organizer_slug
+ *   The organizer slug.
+ *
+ * @return array
+ *   The result.
  */
 function ulf_pretix_webhook($organizer_slug) {
   try {
@@ -168,17 +177,6 @@ function ulf_pretix_node_delete($node) {
 }
 
 /**
- * Implements hook_entitycache_ENTITY_TYPE_load().
- *
- * Using entity cache load to add the ticket information. Hook_entity_load seams
- * to be called after the entity cache have been set. So this ensures that the
- * link is always inserted into the field.
- */
-function ulf_pretix_entitycache_node_load($entities) {
-  // @TODO: Implement this.
-}
-
-/**
  * Implements hook_node_load().
  */
 function ulf_pretix_node_load($nodes, $types) {
@@ -186,15 +184,6 @@ function ulf_pretix_node_load($nodes, $types) {
     $helper = EventHelper::create();
     $helper->setPretixEventInfo($nodes);
   }
-}
-
-/**
- * Implements hook_field_collection_item_load().
- */
-function ulf_pretix_field_collection_item_load(array $entities) {
-  // @TODO
-  // $helper = EventHelper::create();
-  // $helper->setPretixSubEventInfo($entities);
 }
 
 /**
@@ -220,11 +209,11 @@ function ulf_pretix_theme() {
 function ulf_pretix_preprocess_node(&$variables) {
   if (!empty($variables['pretix']['data'])) {
     $data = $variables['pretix']['data'];
-    if (isset($data['pretix_url'],
-              $data['pretix_organizer_slug'],
-              $data['pretix_event_slug'],
-              $data['event']['live'])
-        && TRUE === $data['event']['live']) {
+    if (TRUE === $data['event']['live']
+      && isset($data['pretix_url'],
+        $data['pretix_organizer_slug'],
+        $data['pretix_event_slug'],
+        $data['event']['live'])) {
       $event_url = $data['pretix_url'] . '/' . $data['pretix_organizer_slug'] . '/' . $data['pretix_event_slug'] . '/';
       $widget_css_url = $event_url . 'widget/v1.css';
       $widget_js_url = $data['pretix_url'] . '/widget/v1.en.js';

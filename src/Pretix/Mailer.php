@@ -18,8 +18,15 @@ class Mailer {
 
   /**
    * Render mail.
+   *
+   * @param string $key
+   *   The key.
+   * @param array $message
+   *   The message.
+   * @param array $params
+   *   The params.
    */
-  public function render($key, &$message, $params) {
+  public function render($key, array &$message, array $params) {
     $template = variable_get($key, '');
 
     switch ($key) {

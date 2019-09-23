@@ -82,15 +82,29 @@ class Client {
 
   /**
    * Get event.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   *
+   * @return object
+   *   The result.
    */
-  public function getEvent($eventSlug) {
+  public function getEvent($event) {
+    $eventSlug = $this->getSlug($event);
+
     return $this->get('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/');
   }
 
   /**
    * Create event.
+   *
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
-  public function createEvent($data) {
+  public function createEvent(array $data) {
     return $this->post('organizers/' . $this->organizerSlug . '/events/', [
       'data' => $data,
     ]);
@@ -98,6 +112,14 @@ class Client {
 
   /**
    * Clone event.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
   public function cloneEvent($event, array $data) {
     $eventSlug = $this->getSlug($event);
@@ -109,8 +131,16 @@ class Client {
 
   /**
    * Update event.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
-  public function updateEvent($event, $data) {
+  public function updateEvent($event, array $data) {
     $eventSlug = $this->getSlug($event);
 
     return $this->patch('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/', [
@@ -120,6 +150,12 @@ class Client {
 
   /**
    * Delete event.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   *
+   * @return object
+   *   The result.
    */
   public function deleteEvent($event) {
     $eventSlug = $this->getSlug($event);
@@ -129,6 +165,12 @@ class Client {
 
   /**
    * Get items (products).
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   *
+   * @return object
+   *   The result.
    */
   public function getItems($event) {
     $eventSlug = $this->getSlug($event);
@@ -138,6 +180,14 @@ class Client {
 
   /**
    * Get quotas.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param array $options
+   *   The options.
+   *
+   * @return object
+   *   The result.
    */
   public function getQuotas($event, array $options = []) {
     $eventSlug = $this->getSlug($event);
@@ -147,6 +197,14 @@ class Client {
 
   /**
    * Create quota.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
   public function createQuota($event, array $data) {
     $eventSlug = $this->getSlug($event);
@@ -156,6 +214,16 @@ class Client {
 
   /**
    * Update quota.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param object|int $quota
+   *   The quota or quota id.
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
   public function updateQuota($event, $quota, array $data) {
     $eventSlug = $this->getSlug($event);
@@ -166,6 +234,14 @@ class Client {
 
   /**
    * Get quota availability.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param object|int $quota
+   *   The quota or quota id.
+   *
+   * @return object
+   *   The result.
    */
   public function getQuotaAvailability($event, $quota) {
     $eventSlug = $this->getSlug($event);
@@ -176,6 +252,12 @@ class Client {
 
   /**
    * Get sub-events (event series dates).
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   *
+   * @return object
+   *   The result.
    */
   public function getSubEvents($event) {
     $eventSlug = $this->getSlug($event);
@@ -185,8 +267,16 @@ class Client {
 
   /**
    * Create sub-event.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
-  public function createSubEvent($event, $data) {
+  public function createSubEvent($event, array $data) {
     $eventSlug = $this->getSlug($event);
 
     return $this->post('organizers/' . $this->organizerSlug . '/events/' . $eventSlug . '/subevents/', [
@@ -196,8 +286,18 @@ class Client {
 
   /**
    * Update sub-event.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param object|string $subEvent
+   *   The sub-event or sub-event slug.
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
-  public function updateSubEvent($event, $subEvent, $data) {
+  public function updateSubEvent($event, $subEvent, array $data) {
     $eventSlug = $this->getSlug($event);
     $subEventId = $this->getId($subEvent);
 
@@ -208,6 +308,14 @@ class Client {
 
   /**
    * Delete sub-event.
+   *
+   * @param object|string $event
+   *   The event or event slug.
+   * @param object|string $subEvent
+   *   The sub-event or sub-event slug.
+   *
+   * @return object
+   *   The result.
    */
   public function deleteSubEvent($event, $subEvent) {
     $eventSlug = $this->getSlug($event);
@@ -225,6 +333,12 @@ class Client {
 
   /**
    * Get webhook.
+   *
+   * @param string $id
+   *   The id.
+   *
+   * @return object
+   *   The result.
    */
   public function getWebhook($id) {
     return $this->get('organizers/' . $this->organizerSlug . '/webhooks/' . $id);
@@ -232,6 +346,12 @@ class Client {
 
   /**
    * Create webhook.
+   *
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
   public function createWebhook(array $data) {
     return $this->post('organizers/' . $this->organizerSlug . '/webhooks/', [
@@ -241,6 +361,14 @@ class Client {
 
   /**
    * Update webhook.
+   *
+   * @param object $webhook
+   *   The webhook.
+   * @param array $data
+   *   The data.
+   *
+   * @return object
+   *   The result.
    */
   public function updateWebhook($webhook, array $data) {
     return $this->patch('organizers/' . $this->organizerSlug . '/webhooks/' . $webhook->id . '/', [
@@ -257,6 +385,9 @@ class Client {
    *   The event.
    * @param string $code
    *   The code.
+   *
+   * @return object
+   *   The result.
    */
   public function getOrder($organizer, $event, $code) {
     $organizerSlug = $this->getSlug($organizer);
@@ -267,6 +398,14 @@ class Client {
 
   /**
    * Get request.
+   *
+   * @param string $path
+   *   The path.
+   * @param array $options
+   *   The options.
+   *
+   * @return object
+   *   The result.
    */
   private function get($path, array $options = []) {
     return $this->request('GET', $path, $options);
@@ -274,6 +413,14 @@ class Client {
 
   /**
    * Post request.
+   *
+   * @param string $path
+   *   The path.
+   * @param array $options
+   *   The options.
+   *
+   * @return object
+   *   The result.
    */
   private function post($path, array $options = []) {
     return $this->request('POST', $path, $options);
@@ -281,6 +428,14 @@ class Client {
 
   /**
    * Patch request.
+   *
+   * @param string $path
+   *   The path.
+   * @param array $options
+   *   The options.
+   *
+   * @return object
+   *   The result.
    */
   private function patch($path, array $options = []) {
     return $this->request('PATCH', $path, $options);
@@ -288,6 +443,12 @@ class Client {
 
   /**
    * DELETE request.
+   *
+   * @param string $path
+   *   The path.
+   *
+   * @return object
+   *   The result.
    */
   private function delete($path) {
     return $this->request('DELETE', $path);
@@ -295,6 +456,16 @@ class Client {
 
   /**
    * Request.
+   *
+   * @param string $method
+   *   The method.
+   * @param string $path
+   *   The path.
+   * @param array $options
+   *   The options.
+   *
+   * @return object
+   *   The result.
    */
   private function request($method, $path, array $options = []) {
     $headers = [
@@ -339,7 +510,7 @@ class Client {
     }
 
     if (isset($result->data)) {
-      $data = json_decode($result->data);
+      $data = json_decode($result->data, FALSE);
       if ($data) {
         $result->data = $data;
       }
@@ -363,6 +534,12 @@ class Client {
 
   /**
    * Get id.
+   *
+   * @param object|mixed $object
+   *   The object or object id.
+   *
+   * @return mixed
+   *   The id.
    */
   private function getId($object) {
     return $object->id ?? $object;
