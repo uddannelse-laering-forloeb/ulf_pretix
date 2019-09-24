@@ -9,6 +9,7 @@ dependencies[] = field_collection
 dependencies[] = field_group (>1.5)
 dependencies[] = html5_tools
 dependencies[] = list
+dependencies[] = mail_edit
 dependencies[] = number
 dependencies[] = options
 dependencies[] = secure_permissions (>1.6)

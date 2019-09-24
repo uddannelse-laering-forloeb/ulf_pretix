@@ -123,11 +123,13 @@ class WebhookController {
 
       $wrapper = entity_metadata_wrapper('node', $node);
       $to = $wrapper->field_pretix_email_recipient->value();
-      $language = LANGUAGE_NONE;
+      $language = 'da';
 
       $params = [
-        'subject' => $subject,
-        'content' => $content,
+        'node' => $node,
+        'user' => user_load($node->uid),
+        'pretix_order' => $order,
+        'pretix_order_lines' => $orderLines,
       ];
 
       $result = $this->mailer->send($mailKey, $to, $language, $params);
