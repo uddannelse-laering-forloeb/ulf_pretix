@@ -538,12 +538,7 @@ class EventHelper extends AbstractHelper {
       }
     }
 
-    // Clean up info on pretix sub-events.
-    if (!empty($pretixSubEventIds)) {
-      db_delete('ulf_pretix_subevents')
-        ->condition('pretix_subevent_id', $pretixSubEventIds, 'NOT IN')
-        ->execute();
-    }
+    // @TODO Clean up info on pretix sub-events.
 
     return $info;
   }
