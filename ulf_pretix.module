@@ -241,9 +241,123 @@ function ulf_pretix_preprocess_node(&$variables) {
 }
 
 /**
- * Implements hook_mail().
+ * Implements hook_mailkeys().
  */
-function ulf_pretix_mail($key, &$message, $params) {
-  $mailer = Mailer::create();
-  $mailer->render($key, $message, $params);
+function ulf_pretix_mailkeys() {
+  return [
+    Mailer::PRETIX_EVENT_ORDER_PAID_TEMPLATE => t('Mail sent when a pretix order has been created.'),
+    Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE => t('Mail sent when a pretix order has been canceled.'),
+  ];
+}
+
+/**
+ * Implements hook_mail_edit_text().
+ */
+function ulf_pretix_mail_edit_text($mailkey, $language) {
+  $template = Mailer::getMailTemplate($mailkey, $language);
+  if (NULL !== $template) {
+    $template['always'] = TRUE;
+  }
+
+  return $template;
+}
+
+/**
+ * Implements hook_mail_edit_token_types().
+ */
+function ulf_pretix_mail_edit_token_types() {
+  return ['pretix_order'];
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function ulf_pretix_token_info() {
+  return [
+    'types' => [
+      'ulf_pretix' => [
+        'name' => t('Ulf pretix'),
+      ],
+    ],
+    'tokens' => [
+      'ulf_pretix' => [
+        'pretix_order' => [
+          'name' => t('pretix order'),
+          'description' => t('Details on the pretix order.'),
+        ],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function ulf_pretix_tokens($type, $tokens, array $data = [], array $options = []) {
+  $replacements = [];
+
+  if ('pretix_order' === $type && !empty($data['pretix_order'])) {
+    $order = $data['pretix_order'];
+    $lines = array_values($data['pretix_order_lines']);
+    foreach ($tokens as $name => $original) {
+      $value = NULL;
+      if ('lines:count' === $name) {
+        $value = count($lines);
+      }
+      elseif (preg_match('/^lines:(?P<index>\d+):availability$/', $name, $matches)) {
+        $index = (int) $matches['index'];
+        $line = $lines[$index];
+        $values = [];
+        foreach ($line->quotas as $quota) {
+          $values[] = t('@available_number of @total_size', [
+            '@available_number' => $quota->availability->available_number,
+            '@total_size' => $quota->availability->total_size,
+          ]);
+        }
+        $value = implode('; ', $values);
+      }
+      elseif (preg_match('/^lines:(?P<index>\d+):quotas:count$/', $name, $matches)) {
+        $index = (int) $matches['index'];
+        $value = count($lines[$index]->quotas ?? []);
+      }
+      elseif (preg_match('/^lines:(?P<index>\d+):(?P<key>[^|]+)(?:\\|(?P<format>.+))?$/', $name, $matches)) {
+        $index = (int) $matches['index'];
+        $key = $matches['key'];
+        $format = $matches['format'] ?? NULL;
+        if (isset($lines[$index]->{$key})) {
+          $value = $lines[$index]->{$key};
+        }
+        if ('name' === $key) {
+          $value = $value['da'] ?? $value['en'];
+        }
+        if (NULL !== $format) {
+          if ($value instanceof \DateTime && preg_match('/^date\\(.(?P<format>.+).\\)$/', $format, $matches)) {
+            try {
+              $value = $value->format($matches['format']);
+            }
+            catch (\Exception $exception) {
+
+            }
+          }
+          elseif (is_numeric($value) && preg_match('/^number_format\\(
+                                                   (?P<decimals>\d+)             # number of decimals
+                                                   (?:                           # number_format accept 1, 2 or 4 arguments.
+                                                   \s*,\s*.(?P<dec_point>.).     # decimal point
+                                                   \s*,\s*.(?P<thousands_sep>.). # thousands separator
+                                                   )?
+                                                   \\)$/x', $format, $matches)) {
+            $decimals = (int) $matches['decimals'];
+            $dec_point = $matches['dec_point'] ?? '.';
+            $thousands_sep = $matches['thousands_sep'] ?? ',';
+            $value = number_format($value, $decimals, $dec_point, $thousands_sep);
+          }
+        }
+      }
+      if (NULL !== $value) {
+        $replacements[$original] = $value;
+      }
+    }
+  }
+
+  return $replacements;
 }

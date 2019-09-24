@@ -50,4 +50,99 @@ class Mailer {
     return drupal_mail('ulf_pretix', $key, $to, $language, $params, $from, $send);
   }
 
+  /**
+   * Get mail templates for module mail_edit.
+   *
+   * @param string $mailkey
+   *   The mail key.
+   * @param object $language
+   *   The language.
+   *
+   * @return array
+   *   The mail template.
+   */
+  public static function getMailTemplate($mailkey, $language) {
+    switch ($mailkey) {
+      case Mailer::PRETIX_EVENT_ORDER_PAID_TEMPLATE:
+        return 'da' === $language->language
+          ? [
+            'subject' => 'Ny bestilling af [node:title] på [site:name]',
+            'body' => <<<'BODY'
+En ny bestilling på <a href="[node:url]">[node:title]</a> er blevet afgivet på <a href="[site:url]">[site:name]</a>:
+
+{{[pretix_order:lines:count]#
+[pretix_order:lines:#0:name]
+Startdato: [pretix_order:lines:#0:date_from|date('Y-m-d')]
+Antal: [pretix_order:lines:#0:quantity]
+Tilgængelighed: [pretix_order:lines:#0:availability]
+Stykpris: [pretix_order:lines:#0:item_price|number_format(2, ',', '.')]
+Samlet pris: [pretix_order:lines:#0:total_price|number_format(2, ',', '.')]
+
+}}
+
+Venlig hilsen
+[site:name]
+BODY
+          ] : [
+            'subject' => 'New order for [node:title] on [site:name]',
+            'body' => <<<'BODY'
+An order for <a href="[node:url]">[node:title]</a> has been placed on <a href="[site:url]">[site:name]</a>:
+
+{{[pretix_order:lines:count]#
+[pretix_order:lines:#0:name]
+Start time: [pretix_order:lines:#0:date_from|date('Y-m-d')]
+Quantity: [pretix_order:lines:#0:quantity]
+Availability: [pretix_order:lines:#0:availability]
+Item price: [pretix_order:lines:#0:item_price|number_format(2, ',', '.')]
+Total price: [pretix_order:lines:#0:total_price|number_format(2, ',', '.')]
+
+}}
+
+Best regards,
+[site:name]
+BODY
+          ];
+
+      case Mailer::PRETIX_EVENT_ORDER_CANCELED_TEMPLATE:
+        return 'da' === $language->language
+          ? [
+            'subject' => 'Bestilling af [node:title] på [site:name] annulleret',
+            'body' => <<<'BODY'
+En bestilling af <a href="[node:url]">[node:title]</a> på <a href="[site:url]">[site:name]</a> er blevet annulleret:
+
+{{[pretix_order:lines:count]#
+[pretix_order:lines:#0:name]
+Startdato: [pretix_order:lines:#0:date_from|date('Y-m-d')]
+Antal: [pretix_order:lines:#0:quantity]
+Tilgængelighed: [pretix_order:lines:#0:availability]
+Stykpris: [pretix_order:lines:#0:item_price|number_format(2, ',', '.')]
+Samlet pris: [pretix_order:lines:#0:total_price|number_format(2, ',', '.')]
+
+}}
+
+Venlig hilsen
+[site:name]
+BODY
+          ] : [
+            'subject' => 'Order for [node:title] on [site:name] canceled',
+            'body' => <<<'BODY'
+An order for <a href="[node:url]">[node:title]</a> has been placed on <a href="[site:url]">[site:name]</a>:
+
+{{[pretix_order:lines:count]#
+[pretix_order:lines:#0:name]
+Start time: [pretix_order:lines:#0:date_from|date('Y-m-d')]
+Quantity: [pretix_order:lines:#0:quantity]
+Availability: [pretix_order:lines:#0:availability]
+Item price: [pretix_order:lines:#0:item_price|number_format(2, ',', '.')]
+Total price: [pretix_order:lines:#0:total_price|number_format(2, ',', '.')]
+
+}}
+
+Best regards,
+[site:name]
+BODY
+          ];
+    }
+  }
+
 }
