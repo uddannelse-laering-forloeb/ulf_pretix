@@ -123,7 +123,8 @@ class WebhookController {
 
       $wrapper = entity_metadata_wrapper('node', $node);
       $to = $wrapper->field_pretix_email_recipient->value();
-      $language = 'da';
+      $languages = language_list('language');
+      $language = $languages['da'] ?? $languages['en'];
 
       $params = [
         'node' => $node,
