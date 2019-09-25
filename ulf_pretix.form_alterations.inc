@@ -181,39 +181,61 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
 
     $form['#attached']['css'][] = drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css';
 
+    // Show/hide fields depending of value of "Enable pretix"
+    $states = [
+      'visible' => [
+        ':input[name="field_pretix_enable['.LANGUAGE_NONE.']"]' => ['checked' => TRUE],
+      ],
+    ];
+    $fields = ['field_pretix_synchronize', 'field_pretix_date', 'field_pretix_email_recipient'];
+    foreach ($fields as $field) {
+      $form[$field]['#states'] = $states;
+    }
+    $states = [
+      'visible' => [
+        ':input[name="field_pretix_enable['.LANGUAGE_NONE.']"]' => ['checked' => FALSE],
+      ],
+    ];
+    $fields = ['field_pretix_show_widget_from'];
+    foreach ($fields as $field) {
+      $form[$field]['#states'] = $states;
+    }
+
     // Check that we have a valid node object.
     if (isset($node->nid)) {
-      $markup = theme('node__pretix_info', [
-        'node' => $node,
-        'pretix_urls' => [
-          'event_url' => $helper->getPretixEventUrl($node),
-          'event_shop_url' => $helper->getPretixEventShopUrl($node),
-          'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
-        ],
-      ]);
-
-      // Add content at top of pretix group.
-      $form['pretix_info'] = [
-        '#markup' => $markup,
-        '#weight' => -1000,
-      ];
-      $form['#group_children']['pretix_info'] = 'group_pretix';
-
       $wrapper = entity_metadata_wrapper('node', $node);
-      if (FALSE === $wrapper->field_pretix_synchronize->value()) {
-        $form['field_pretix_synchronize']['#access'] = FALSE;
-        $form['field_pretix_date']['#access'] = FALSE;
+      if (TRUE === $wrapper->field_pretix_enable->value()) {
+        $markup = theme('node__pretix_info', [
+          'node' => $node,
+          'pretix_urls' => [
+            'event_url' => $helper->getPretixEventUrl($node),
+            'event_shop_url' => $helper->getPretixEventShopUrl($node),
+            'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
+          ],
+        ]);
 
-        $form['pretix_synchronize_info'] = [
-          '#prefix' => '<div class="messages warning"><div>',
-          '#suffix' => '</div></div>',
-          '#markup' => t(
-            'Note: This event is not syncronized with pretix. Go to <a href="@url">@url</a> to edit the event in pretix.',
-            ['@url' => $helper->getPretixEventUrl($node)]
-          ),
-          '#weight' => -999,
+        // Add content at top of pretix group.
+        $form['pretix_info'] = [
+          '#markup' => $markup,
+          '#weight' => -1000,
         ];
-        $form['#group_children']['pretix_synchronize_info'] = 'group_pretix';
+        $form['#group_children']['pretix_info'] = 'group_pretix';
+
+        if (FALSE === $wrapper->field_pretix_synchronize->value()) {
+          $form['field_pretix_synchronize']['#access'] = FALSE;
+          $form['field_pretix_date']['#access'] = FALSE;
+
+          $form['pretix_synchronize_info'] = [
+            '#prefix' => '<div class="messages warning"><div>',
+            '#suffix' => '</div></div>',
+            '#markup' => t(
+              'Note: This event is not syncronized with pretix. Go to <a href="@url">@url</a> to edit the event in pretix.',
+              ['@url' => $helper->getPretixEventUrl($node)]
+            ),
+            '#weight' => -999,
+          ];
+          $form['#group_children']['pretix_synchronize_info'] = 'group_pretix';
+        }
       }
     }
 

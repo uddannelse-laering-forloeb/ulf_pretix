@@ -112,6 +112,10 @@ function ulf_pretix_node_update($node) {
  *   The node.
  */
 function _ulf_synchronize_pretix_event($node) {
+  $wrapper = entity_metadata_wrapper('node', $node);
+  if (TRUE !== $wrapper->field_pretix_enable->value()) {
+    return;
+  }
   $helper = EventHelper::create();
   if ($helper->isPretixEventNode($node)) {
     $result = $helper->syncronizePretixEvent($node);
@@ -209,8 +213,9 @@ function ulf_pretix_preprocess_node(&$variables) {
   $wrapper = entity_metadata_wrapper('node', $widgetNode);
   if (!empty($wrapper->field_pretix_show_widget_from->value())) {
     $widgetNode = $wrapper->field_pretix_show_widget_from->value();
+    $wrapper = entity_metadata_wrapper('node', $widgetNode->nid);
   }
-  if (!empty($widgetNode->pretix['data'])) {
+  if (!empty($widgetNode->pretix['data']) && TRUE === $wrapper->field_pretix_enable->value()) {
     // Render the pretix widget if event is live.
     $data = $widgetNode->pretix['data'];
     if (TRUE === $data['event']['live']

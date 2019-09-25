@@ -27,6 +27,7 @@ function ulf_pretix_field_group_info() {
       1 => 'field_pretix_email_recipient',
       2 => 'field_pretix_synchronize',
       3 => 'field_pretix_show_widget_from',
+      4 => 'field_pretix_enable',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -59,6 +60,7 @@ function ulf_pretix_field_group_info() {
       1 => 'field_pretix_email_recipient',
       2 => 'field_pretix_synchronize',
       3 => 'field_pretix_show_widget_from',
+      4 => 'field_pretix_enable',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
