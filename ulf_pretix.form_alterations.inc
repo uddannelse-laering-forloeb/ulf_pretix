@@ -297,15 +297,31 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
  */
 function ulf_pretix_form_validate($form, &$form_state) {
   $values = $form_state['values'];
-  if (isset($values['field_pretix_date'][LANGUAGE_NONE])) {
-    foreach ($values['field_pretix_date'][LANGUAGE_NONE] as $key => $value) {
-      if (is_numeric($key)) {
-        $is_free = 1 === $value['field_pretix_free'][LANGUAGE_NONE][0]['value'];
-        $price = $value['field_pretix_price'][LANGUAGE_NONE][0]['value'];
-        if (!$is_free && empty($price)) {
-          form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_price', t('Price is required for non-free dates.'));
-        }
-      }
+  $enable_pretix = 1 === ($values['field_pretix_enable'][LANGUAGE_NONE][0]['value'] ?? 0);
+  if (!$enable_pretix) {
+    return;
+  }
+
+  $field_pretix_date = $values['field_pretix_date'][LANGUAGE_NONE];
+  $dates = array_filter($field_pretix_date, function ($key) {
+    return is_numeric($key);
+  }, ARRAY_FILTER_USE_KEY);
+  if (0 === count($dates)) {
+    form_set_error('field_pretix_date', t('At least one date is required.'));
+  }
+  foreach ($dates as $key => $value) {
+    if (empty($value['field_pretix_spaces'][LANGUAGE_NONE][0]['value'])) {
+      form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_spaces', t('Field spaces is required.'));
+    }
+
+    if (empty($value['field_pretix_start_date'][LANGUAGE_NONE][0]['value'])) {
+      form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_start_date', t('Field start date is required.'));
+    }
+
+    $is_free = 1 === $value['field_pretix_free'][LANGUAGE_NONE][0]['value'];
+    $price = $value['field_pretix_price'][LANGUAGE_NONE][0]['value'];
+    if (!$is_free && empty($price)) {
+      form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_price', t('Price is required for non-free dates.'));
     }
   }
 }

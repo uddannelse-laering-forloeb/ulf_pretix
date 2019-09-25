@@ -164,7 +164,7 @@ function ulf_pretix_field_default_field_instances() {
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_pretix_spaces',
     'label' => 'Pladser',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'max' => '',
       'min' => '',
@@ -207,7 +207,7 @@ function ulf_pretix_field_default_field_instances() {
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_pretix_start_date',
     'label' => 'Starttidspunkt',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'default_value' => 'blank',
       'default_value2' => 'same',
@@ -261,7 +261,7 @@ function ulf_pretix_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_pretix_date',
     'label' => 'Dato',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
@@ -482,7 +482,7 @@ function ulf_pretix_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_pretix_date',
     'label' => 'Dato',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
