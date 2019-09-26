@@ -207,6 +207,11 @@ function ulf_pretix_theme() {
  * Implements hook_preprocees_node().
  */
 function ulf_pretix_preprocess_node(&$variables) {
+  if (!in_array($variables['type'], EventHelper::PRETIX_CONTENT_TYPES, TRUE)
+      || 'full' !== $variables['view_mode']) {
+    return;
+  }
+
   // Check if we should show a pretix shop widget.
   $widgetNode = node_load($variables['nid']);
   // We may have to show widget from another node.
