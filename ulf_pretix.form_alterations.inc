@@ -182,23 +182,36 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
     $form['#attached']['css'][] = drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css';
 
     // Show/hide fields depending of value of "Enable pretix"
-    $states = [
+    $visible_if_pretix_enabled = [
       'visible' => [
+        ':input[name="field_pretix_enable['.LANGUAGE_NONE.']"]' => ['checked' => TRUE],
+      ],
+    ];
+    $required_if_pretix_enabled = [
+      'required' => [
         ':input[name="field_pretix_enable['.LANGUAGE_NONE.']"]' => ['checked' => TRUE],
       ],
     ];
     $fields = ['field_pretix_synchronize', 'field_pretix_date', 'field_pretix_email_recipient'];
     foreach ($fields as $field) {
-      $form[$field]['#states'] = $states;
+      $form[$field]['#states'] = $visible_if_pretix_enabled;
     }
-    $states = [
+    $not_visible_if_pretix_enabled = [
       'visible' => [
         ':input[name="field_pretix_enable['.LANGUAGE_NONE.']"]' => ['checked' => FALSE],
       ],
     ];
     $fields = ['field_pretix_show_widget_from'];
     foreach ($fields as $field) {
-      $form[$field]['#states'] = $states;
+      $form[$field]['#states'] = $not_visible_if_pretix_enabled;
+    }
+
+    $field_pretix_date = $form['field_pretix_date'][LANGUAGE_NONE];
+    foreach ($field_pretix_date as $key => $value) {
+      if (is_numeric($key)) {
+        $form['field_pretix_date'][LANGUAGE_NONE][$key]['field_pretix_spaces']['#states'] = $required_if_pretix_enabled;
+        $form['field_pretix_date'][LANGUAGE_NONE][$key]['field_pretix_start_date']['#states'] = $required_if_pretix_enabled;
+      }
     }
 
     // Check that we have a valid node object.
