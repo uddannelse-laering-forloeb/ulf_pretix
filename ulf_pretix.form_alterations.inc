@@ -325,3 +325,23 @@ function ulf_pretix_form_validate($form, &$form_state) {
     }
   }
 }
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function ulf_pretix_query_entityreference_alter(QueryAlterableInterface $query) {
+  $field = $query->getMetaData('field');
+  if ('field_pretix_show_widget_from' !== $field['field_name']) {
+    return;
+  }
+  if (null !== $metadata = $query->getMetaData('entityreference_selection_handler')) {
+    $entity = $metadata->entity;
+    // Exclude the node getting the reference.
+    $query->condition('node.nid', $entity->nid, '<>');
+    // Allow only references of the same node type.
+    $query->condition('node.type', $entity->type, '=');
+    // Join in the pretix_enable field
+    $query->leftJoin('field_data_field_pretix_enable', 'field_pretix_enable', 'field_pretix_enable.entity_id = node.nid AND field_pretix_enable.entity_type = \'node\'');
+    $query->condition('field_pretix_enable.field_pretix_enable_value', 1, '=');
+  }
+}
