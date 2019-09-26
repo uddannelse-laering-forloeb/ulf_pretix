@@ -164,7 +164,7 @@ function ulf_pretix_field_default_field_instances() {
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_pretix_spaces',
     'label' => 'Pladser',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'max' => '',
       'min' => '',
@@ -207,7 +207,7 @@ function ulf_pretix_field_default_field_instances() {
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_pretix_start_date',
     'label' => 'Starttidspunkt',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'default_value' => 'blank',
       'default_value2' => 'same',
@@ -261,7 +261,7 @@ function ulf_pretix_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_pretix_date',
     'label' => 'Dato',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
@@ -270,7 +270,7 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'field_collection',
       'settings' => array(),
       'type' => 'field_collection_embed',
-      'weight' => 55,
+      'weight' => 62,
     ),
   );
 
@@ -313,7 +313,101 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'html5_tools',
       'settings' => array(),
       'type' => 'emailwidget',
-      'weight' => 56,
+      'weight' => 63,
+    ),
+  );
+
+  // Exported field_instance: 'node-course-field_pretix_enable'.
+  $field_instances['node-course-field_pretix_enable'] = array(
+    'bundle' => 'course',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 43,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_enable',
+    'label' => 'Enable pretix',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 59,
+    ),
+  );
+
+  // Exported field_instance: 'node-course-field_pretix_show_widget_from'.
+  $field_instances['node-course-field_pretix_show_widget_from'] = array(
+    'bundle' => 'course',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Show pretix widget from another course.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 44,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_show_widget_from',
+    'label' => 'Show widget from',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 61,
     ),
   );
 
@@ -361,7 +455,7 @@ function ulf_pretix_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 54,
+      'weight' => 60,
     ),
   );
 
@@ -376,7 +470,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -388,7 +482,7 @@ function ulf_pretix_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_pretix_date',
     'label' => 'Dato',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
@@ -397,7 +491,7 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'field_collection',
       'settings' => array(),
       'type' => 'field_collection_embed',
-      'weight' => 81,
+      'weight' => 88,
     ),
   );
 
@@ -435,7 +529,90 @@ function ulf_pretix_field_default_field_instances() {
       'module' => 'html5_tools',
       'settings' => array(),
       'type' => 'emailwidget',
-      'weight' => 82,
+      'weight' => 89,
+    ),
+  );
+
+  // Exported field_instance: 'node-course_educators-field_pretix_enable'.
+  $field_instances['node-course_educators-field_pretix_enable'] = array(
+    'bundle' => 'course_educators',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 39,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_enable',
+    'label' => 'Enable pretix',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 85,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-course_educators-field_pretix_show_widget_from'.
+  $field_instances['node-course_educators-field_pretix_show_widget_from'] = array(
+    'bundle' => 'course_educators',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 40,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pretix_show_widget_from',
+    'label' => 'Show widget from',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 87,
     ),
   );
 
@@ -454,7 +631,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -477,7 +654,7 @@ function ulf_pretix_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 80,
+      'weight' => 86,
     ),
   );
 
@@ -676,6 +853,8 @@ function ulf_pretix_field_default_field_instances() {
   t('Pladser');
   t('Pretix url');
   t('Pris');
+  t('Show pretix widget from another course.');
+  t('Show widget from');
   t('Starttidspunkt');
   t('The API token is found in the pretix configuration');
   t('The full pretix url, e.g. https://pretix.eu/');

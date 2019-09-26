@@ -26,6 +26,8 @@ function ulf_pretix_field_group_info() {
       0 => 'field_pretix_date',
       1 => 'field_pretix_email_recipient',
       2 => 'field_pretix_synchronize',
+      3 => 'field_pretix_show_widget_from',
+      4 => 'field_pretix_enable',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -55,11 +57,10 @@ function ulf_pretix_field_group_info() {
     'weight' => '15',
     'children' => array(
       0 => 'field_pretix_date',
-      1 => 'field_pretix_max_per_order',
-      2 => 'field_pretix_out_of_stock',
-      3 => 'field_pretix_wait_list',
-      4 => 'field_pretix_email_recipient',
-      5 => 'field_pretix_synchronize',
+      1 => 'field_pretix_email_recipient',
+      2 => 'field_pretix_synchronize',
+      3 => 'field_pretix_show_widget_from',
+      4 => 'field_pretix_enable',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

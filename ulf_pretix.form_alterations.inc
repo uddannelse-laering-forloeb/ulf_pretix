@@ -181,39 +181,74 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
 
     $form['#attached']['css'][] = drupal_get_path('module', 'ulf_pretix') . '/css/ulf_pretix.css';
 
+    // Show/hide fields depending of value of "Enable pretix"
+    $visible_if_pretix_enabled = [
+      'visible' => [
+        ':input[name="field_pretix_enable['.LANGUAGE_NONE.']"]' => ['checked' => TRUE],
+      ],
+    ];
+    $required_if_pretix_enabled = [
+      'required' => [
+        ':input[name="field_pretix_enable['.LANGUAGE_NONE.']"]' => ['checked' => TRUE],
+      ],
+    ];
+    $fields = ['field_pretix_synchronize', 'field_pretix_date', 'field_pretix_email_recipient'];
+    foreach ($fields as $field) {
+      $form[$field]['#states'] = $visible_if_pretix_enabled;
+    }
+    $not_visible_if_pretix_enabled = [
+      'visible' => [
+        ':input[name="field_pretix_enable['.LANGUAGE_NONE.']"]' => ['checked' => FALSE],
+      ],
+    ];
+    $fields = ['field_pretix_show_widget_from'];
+    foreach ($fields as $field) {
+      $form[$field]['#states'] = $not_visible_if_pretix_enabled;
+    }
+
+    $field_pretix_date = $form['field_pretix_date'][LANGUAGE_NONE];
+    foreach ($field_pretix_date as $key => $value) {
+      if (is_numeric($key)) {
+        $form['field_pretix_date'][LANGUAGE_NONE][$key]['field_pretix_spaces']['#states'] = $required_if_pretix_enabled;
+        $form['field_pretix_date'][LANGUAGE_NONE][$key]['field_pretix_start_date']['#states'] = $required_if_pretix_enabled;
+      }
+    }
+
     // Check that we have a valid node object.
     if (isset($node->nid)) {
-      $markup = theme('node__pretix_info', [
-        'node' => $node,
-        'pretix_urls' => [
-          'event_url' => $helper->getPretixEventUrl($node),
-          'event_shop_url' => $helper->getPretixEventShopUrl($node),
-          'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
-        ],
-      ]);
-
-      // Add content at top of pretix group.
-      $form['pretix_info'] = [
-        '#markup' => $markup,
-        '#weight' => -1000,
-      ];
-      $form['#group_children']['pretix_info'] = 'group_pretix';
-
       $wrapper = entity_metadata_wrapper('node', $node);
-      if (FALSE === $wrapper->field_pretix_synchronize->value()) {
-        $form['field_pretix_synchronize']['#access'] = FALSE;
-        $form['field_pretix_date']['#access'] = FALSE;
+      if (TRUE === $wrapper->field_pretix_enable->value()) {
+        $markup = theme('node__pretix_info', [
+          'node' => $node,
+          'pretix_urls' => [
+            'event_url' => $helper->getPretixEventUrl($node),
+            'event_shop_url' => $helper->getPretixEventShopUrl($node),
+            'waitinglist_url' => $helper->getPretixEventUrl($node, 'waitinglist/'),
+          ],
+        ]);
 
-        $form['pretix_synchronize_info'] = [
-          '#prefix' => '<div class="messages warning"><div>',
-          '#suffix' => '</div></div>',
-          '#markup' => t(
-            'Note: This event is not syncronized with pretix. Go to <a href="@url">@url</a> to edit the event in pretix.',
-            ['@url' => $helper->getPretixEventUrl($node)]
-          ),
-          '#weight' => -999,
+        // Add content at top of pretix group.
+        $form['pretix_info'] = [
+          '#markup' => $markup,
+          '#weight' => -1000,
         ];
-        $form['#group_children']['pretix_synchronize_info'] = 'group_pretix';
+        $form['#group_children']['pretix_info'] = 'group_pretix';
+
+        if (FALSE === $wrapper->field_pretix_synchronize->value()) {
+          $form['field_pretix_synchronize']['#access'] = FALSE;
+          $form['field_pretix_date']['#access'] = FALSE;
+
+          $form['pretix_synchronize_info'] = [
+            '#prefix' => '<div class="messages warning"><div>',
+            '#suffix' => '</div></div>',
+            '#markup' => t(
+              'Note: This event is not syncronized with pretix. Go to <a href="@url">@url</a> to edit the event in pretix.',
+              ['@url' => $helper->getPretixEventUrl($node)]
+            ),
+            '#weight' => -999,
+          ];
+          $form['#group_children']['pretix_synchronize_info'] = 'group_pretix';
+        }
       }
     }
 
@@ -275,15 +310,51 @@ function ulf_pretix_form_alter(&$form, &$form_state, $form_id) {
  */
 function ulf_pretix_form_validate($form, &$form_state) {
   $values = $form_state['values'];
-  if (isset($values['field_pretix_date'][LANGUAGE_NONE])) {
-    foreach ($values['field_pretix_date'][LANGUAGE_NONE] as $key => $value) {
-      if (is_numeric($key)) {
-        $is_free = 1 === $value['field_pretix_free'][LANGUAGE_NONE][0]['value'];
-        $price = $value['field_pretix_price'][LANGUAGE_NONE][0]['value'];
-        if (!$is_free && empty($price)) {
-          form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_price', t('Price is required for non-free dates.'));
-        }
-      }
+  $enable_pretix = 1 === ($values['field_pretix_enable'][LANGUAGE_NONE][0]['value'] ?? 0);
+  if (!$enable_pretix) {
+    return;
+  }
+
+  $field_pretix_date = $values['field_pretix_date'][LANGUAGE_NONE];
+  $dates = array_filter($field_pretix_date, function ($key) {
+    return is_numeric($key);
+  }, ARRAY_FILTER_USE_KEY);
+  if (0 === count($dates)) {
+    form_set_error('field_pretix_date', t('At least one date is required.'));
+  }
+  foreach ($dates as $key => $value) {
+    if (empty($value['field_pretix_spaces'][LANGUAGE_NONE][0]['value'])) {
+      form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_spaces', t('Field spaces is required.'));
     }
+
+    if (empty($value['field_pretix_start_date'][LANGUAGE_NONE][0]['value'])) {
+      form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_start_date', t('Field start date is required.'));
+    }
+
+    $is_free = 1 === $value['field_pretix_free'][LANGUAGE_NONE][0]['value'];
+    $price = $value['field_pretix_price'][LANGUAGE_NONE][0]['value'];
+    if (!$is_free && empty($price)) {
+      form_set_error('field_pretix_date]['.LANGUAGE_NONE.']['.$key.'][field_pretix_price', t('Price is required for non-free dates.'));
+    }
+  }
+}
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function ulf_pretix_query_entityreference_alter(QueryAlterableInterface $query) {
+  $field = $query->getMetaData('field');
+  if ('field_pretix_show_widget_from' !== $field['field_name']) {
+    return;
+  }
+  if (null !== $metadata = $query->getMetaData('entityreference_selection_handler')) {
+    $entity = $metadata->entity;
+    // Exclude the node getting the reference.
+    $query->condition('node.nid', $entity->nid, '<>');
+    // Allow only references of the same node type.
+    $query->condition('node.type', $entity->type, '=');
+    // Join in the pretix_enable field
+    $query->leftJoin('field_data_field_pretix_enable', 'field_pretix_enable', 'field_pretix_enable.entity_id = node.nid AND field_pretix_enable.entity_type = \'node\'');
+    $query->condition('field_pretix_enable.field_pretix_enable_value', 1, '=');
   }
 }
