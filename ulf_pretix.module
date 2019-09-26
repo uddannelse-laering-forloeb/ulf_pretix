@@ -374,3 +374,16 @@ function ulf_pretix_tokens($type, $tokens, array $data = [], array $options = []
 
   return $replacements;
 }
+
+/**
+ * Implements hook_search_node_filtered_item_alter().
+ */
+function ulf_pretix_search_node_filtered_item_alter(&$filteredItem) {
+  if (isset($filteredItem['nid'])) {
+    $node = node_load($filteredItem['nid']);
+    if (isset($node->pretix['data']['available']) && FALSE === $node->pretix['data']['available']) {
+      $filteredItem['ribbon_message'] = t('Sold out');
+      $filteredItem['ribbon_class_names'] = ['warning'];
+    }
+  }
+}

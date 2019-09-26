@@ -613,6 +613,14 @@ class EventHelper extends AbstractHelper {
         // Flush cache for node.
         $cid = url('node/' . $node->nid, ['absolute' => TRUE]);
         cache_clear_all($cid, 'cache_page');
+        // Re-index the node in the 'courses' index.
+        if (module_exists('search_api')) {
+          $index = search_api_index_load('courses');
+          if (NULL !== $index) {
+            search_api_entity_update($node, 'node');
+            search_api_index_items($index);
+          }
+        }
       }
     }
   }
