@@ -539,7 +539,6 @@ class EventHelper extends AbstractHelper {
     }
 
     // @TODO Clean up info on pretix sub-events.
-
     return $info;
   }
 
