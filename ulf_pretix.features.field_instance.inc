@@ -23,11 +23,11 @@ function ulf_pretix_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 4,
+        'weight' => 1,
       ),
     ),
     'entity_type' => 'field_collection_item',
@@ -57,18 +57,9 @@ function ulf_pretix_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'date',
-        'settings' => array(
-          'custom_date_format' => '',
-          'format_type' => 'long',
-          'fromto' => 'both',
-          'multiple_from' => '',
-          'multiple_number' => '',
-          'multiple_to' => '',
-          'show_remaining_days' => FALSE,
-        ),
-        'type' => 'date_default',
-        'weight' => 2,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
     ),
     'entity_type' => 'field_collection_item',
@@ -108,16 +99,16 @@ function ulf_pretix_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'number',
         'settings' => array(
-          'decimal_separator' => '.',
-          'prefix_suffix' => TRUE,
+          'decimal_separator' => ',',
+          'prefix_suffix' => 1,
           'scale' => 2,
           'thousand_separator' => '',
         ),
         'type' => 'number_decimal',
-        'weight' => 5,
+        'weight' => 2,
       ),
     ),
     'entity_type' => 'field_collection_item',
@@ -150,15 +141,9 @@ function ulf_pretix_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'number',
-        'settings' => array(
-          'decimal_separator' => '.',
-          'prefix_suffix' => TRUE,
-          'scale' => 0,
-          'thousand_separator' => '',
-        ),
-        'type' => 'number_integer',
-        'weight' => 1,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'field_collection_item',
@@ -189,10 +174,9 @@ function ulf_pretix_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'date',
         'settings' => array(
-          'custom_date_format' => '',
           'format_type' => 'long',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -201,7 +185,7 @@ function ulf_pretix_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 3,
+        'weight' => 0,
       ),
     ),
     'entity_type' => 'field_collection_item',
@@ -247,9 +231,16 @@ function ulf_pretix_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+        'module' => 'field_collection',
+        'settings' => array(
+          'add' => 'Tilføj',
+          'delete' => 'Slet',
+          'description' => TRUE,
+          'edit' => 'Redigér',
+          'view_mode' => 'full',
+        ),
+        'type' => 'field_collection_view',
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -291,7 +282,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -338,7 +329,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 41,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -382,7 +373,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 42,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -432,7 +423,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 40,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -468,9 +459,16 @@ function ulf_pretix_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 35,
+        'module' => 'field_collection',
+        'settings' => array(
+          'add' => 'Tilføj',
+          'delete' => 'Slet',
+          'description' => TRUE,
+          'edit' => 'Redigér',
+          'view_mode' => 'full',
+        ),
+        'type' => 'field_collection_view',
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -507,7 +505,7 @@ function ulf_pretix_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
